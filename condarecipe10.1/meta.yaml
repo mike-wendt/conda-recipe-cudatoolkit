@@ -1,0 +1,24 @@
+package:
+   name: cudatoolkit
+   # match the package version to the libcudart.so version
+   version: 10.1.168
+
+build:
+  number: 0
+  script_env:
+    - NVTOOLSEXT_INSTALL_PATH
+
+requirements:
+  build:
+    - python >=3
+    - requests
+    - 7za # [win]
+    - conda
+    - pyyaml
+
+source:
+    path: ../scripts/
+
+test:
+  requires:
+    - numba

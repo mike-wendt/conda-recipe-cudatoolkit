@@ -15,7 +15,7 @@ from tempfile import TemporaryDirectory as tempdir
 from conda.exports import download, hashsum_file
 
 config = {}
-versions = ['7.5', '8.0', '9.0', '9.1', '9.2', '10.0']
+versions = ['7.5', '8.0', '9.0', '9.1', '9.2', '10.0', '10.1']
 
 for v in versions:
     config[v] = {'linux': {}, 'windows': {}, 'osx': {}}
@@ -404,6 +404,74 @@ cu_10['osx'] = {'blob': 'cuda_10.0.130_mac',
                }
 
 
+#######################
+### CUDA 10.1 setup ###
+#######################
+
+cu_101 = config['10.1']
+cu_101['base_url'] = "https://developer.nvidia.com/compute/cuda/10.1/Prod/"
+cu_101['installers_url_ext'] = 'local_installers/'
+cu_101['patch_url_ext'] = ''
+cu_101['md5_url'] = "https://developer.download.nvidia.com/compute/cuda/10.1/Prod/docs2/sidebar/md5sum.txt"
+cu_101['cuda_libraries'] = [
+    'cublas',
+    'cublasLt',
+    'cudart',
+    'cufft',
+    'cufftw',
+    'curand',
+    'cusolver',
+    'cusparse',
+    'nppc',
+    'nppial',
+    'nppicc',
+    'nppicom',
+    'nppidei',
+    'nppif',
+    'nppig',
+    'nppim',
+    'nppist',
+    'nppisu',
+    'nppitc',
+    'npps',
+    'nvToolsExt',
+    'nvblas',
+    'nvgraph',
+    'nvjpeg',
+    'nvrtc',
+    'nvrtc-builtins',
+]
+cu_101['libdevice_versions'] = ['10']
+
+cu_101['linux'] = {'blob': 'cuda_10.1.168_418.67_linux.run',
+                 'patches': [],
+                 # need globs to handle symlinks
+                 'cuda_lib_fmt': 'lib{0}.so*',
+                 'nvtoolsext_fmt': 'lib{0}.so*',
+                 'nvvm_lib_fmt': 'lib{0}.so*',
+                 'libdevice_lib_fmt': 'libdevice.{0}.bc'
+                 }
+
+cu_101['windows'] = {'blob': 'cuda_10.1.168_425.325_windows',
+                   'patches': [],
+                   'cuda_lib_fmt': '{0}64_101*.dll',
+                   'nvtoolsext_fmt': '{0}64_1.dll',
+                   'nvvm_lib_fmt': '{0}64_33_0.dll',
+                   'libdevice_lib_fmt': 'libdevice.{0}.bc',
+                   'NvToolsExtPath' :
+                       os.path.join('c:' + os.sep, 'Program Files',
+                                    'NVIDIA Corporation', 'NVToolsExt', 'bin')
+                   }
+
+cu_101['osx'] = {'blob': 'cuda_10.1.168_mac',
+               'patches': [],
+               'cuda_lib_fmt': 'lib{0}.10.1.dylib',
+               'nvtoolsext_fmt': 'lib{0}.1.dylib',
+               'nvvm_lib_fmt': 'lib{0}.3.3.0.dylib',
+               'libdevice_lib_fmt': 'libdevice.{0}.bc'
+               }
+
+
 class Extractor(object):
     """Extractor base class, platform specific extractors should inherit
     from this class.
@@ -659,8 +727,12 @@ class LinuxExtractor(Extractor):
         patches = self.patches
         os.chmod(runfile, 0o777)
         with tempdir() as tmpd:
-            cmd = [os.path.join(self.src_dir, runfile),
-                        '--toolkitpath', tmpd, '--toolkit', '--silent']
+            if self.cu_version in ['10.1']:
+                cmd = [os.path.join(self.src_dir, runfile),
+                       '--installpath=%s' % (tmpd, ), '--toolkit', '--silent']
+            else:
+                cmd = [os.path.join(self.src_dir, runfile),
+                       '--toolkitpath', tmpd, '--toolkit', '--silent']
             check_call(cmd)
             for p in patches:
                 os.chmod(p, 0o777)

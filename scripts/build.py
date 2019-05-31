@@ -683,7 +683,7 @@ class WindowsExtractor(Extractor):
                 store = os.path.join(tmpd, store_name)
                 os.mkdir(store)
                 for path, dirs, files in os.walk(extractdir):
-                    if 'jre' not in path:  # don't get jre dlls
+                    if 'jre' not in path and 'GFExperience' not in path:  # don't get jre or GFExperience dlls
                         for filename in fnmatch.filter(files, "*.dll"):
                             if not Path(os.path.join(
                                     store, filename)).is_file():

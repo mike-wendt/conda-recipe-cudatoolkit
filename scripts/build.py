@@ -445,14 +445,16 @@ if sys.platform.startswith('linux'):
     cu_101['cuda_libraries'].append('nvjpeg')
 cu_101['libdevice_versions'] = ['10']
 
-cu_101['linux'] = {'blob': 'cuda_10.1.168_418.67_linux.run',
-                 'patches': [],
-                 # need globs to handle symlinks
-                 'cuda_lib_fmt': 'lib{0}.so*',
-                 'nvtoolsext_fmt': 'lib{0}.so*',
-                 'nvvm_lib_fmt': 'lib{0}.so*',
-                 'libdevice_lib_fmt': 'libdevice.{0}.bc'
-                 }
+cu_101['linux'] = {
+    'blob': 'cuda_10.1.168_418.67_rhel6.run',
+    'embedded_blob': 'cuda-linux.10.1.168-26218862.run',
+    'patches': [],
+    # need globs to handle symlinks
+    'cuda_lib_fmt': 'lib{0}.so*',
+    'nvtoolsext_fmt': 'lib{0}.so*',
+    'nvvm_lib_fmt': 'lib{0}.so*',
+    'libdevice_lib_fmt': 'libdevice.{0}.bc'
+}
 
 cu_101['windows'] = {'blob': 'cuda_10.1.168_425.25_windows.exe',
                    'patches': [],
@@ -498,6 +500,7 @@ class Extractor(object):
         self.cuda_libraries = ver_config['cuda_libraries']
         self.libdevice_versions = ver_config['libdevice_versions']
         self.cu_blob = plt_config['blob']
+        self.embedded_blob = plt_config.get('embedded_blob', None)
         self.cuda_lib_fmt = plt_config['cuda_lib_fmt']
         self.nvtoolsext_fmt = plt_config.get('nvtoolsext_fmt')
         self.nvvm_lib_fmt = plt_config['nvvm_lib_fmt']
@@ -729,13 +732,19 @@ class LinuxExtractor(Extractor):
         patches = self.patches
         os.chmod(runfile, 0o777)
         with tempdir() as tmpd:
-            if self.cu_version in ['10.1']:
-                cmd = [os.path.join(self.src_dir, runfile),
-                       '--installpath=%s' % (tmpd, ), '--toolkit', '--silent']
+            if self.embedded_blob is not None:
+                with tempdir() as tmpd2:
+                    cmd = [os.path.join(self.src_dir, runfile),
+                           '--extract=%s' % (tmpd2, ), '--nox11', '--silent']
+                    check_call(cmd)
+                    # extract the embedded blob
+                    cmd = [os.path.join(tmpd2, self.embedded_blob),
+                           '-prefix', tmpd, '-noprompt', '--nox11']
+                    check_call(cmd)
             else:
                 cmd = [os.path.join(self.src_dir, runfile),
                        '--toolkitpath', tmpd, '--toolkit', '--silent']
-            check_call(cmd)
+                check_call(cmd)
             for p in patches:
                 os.chmod(p, 0o777)
                 cmd = [os.path.join(self.src_dir, p),

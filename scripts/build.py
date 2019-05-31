@@ -452,9 +452,9 @@ cu_101['linux'] = {'blob': 'cuda_10.1.168_418.67_linux.run',
                  'libdevice_lib_fmt': 'libdevice.{0}.bc'
                  }
 
-cu_101['windows'] = {'blob': 'cuda_10.1.168_425.325_windows',
+cu_101['windows'] = {'blob': 'cuda_10.1.168_425.25_windows.exe',
                    'patches': [],
-                   'cuda_lib_fmt': '{0}64_101*.dll',
+                   'cuda_lib_fmt': '{0}64_10*.dll',
                    'nvtoolsext_fmt': '{0}64_1.dll',
                    'nvvm_lib_fmt': '{0}64_33_0.dll',
                    'libdevice_lib_fmt': 'libdevice.{0}.bc',

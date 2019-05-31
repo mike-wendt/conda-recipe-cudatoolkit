@@ -437,10 +437,12 @@ cu_101['cuda_libraries'] = [
     'nvToolsExt',
     'nvblas',
     'nvgraph',
-    'nvjpeg',
     'nvrtc',
     'nvrtc-builtins',
 ]
+# nvjpeg is only available on linux
+if sys.platform.startswith('linux'):
+    cu_101['cuda_libraries'].append('nvjpeg')
 cu_101['libdevice_versions'] = ['10']
 
 cu_101['linux'] = {'blob': 'cuda_10.1.168_418.67_linux.run',

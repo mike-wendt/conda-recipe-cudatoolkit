@@ -15,10 +15,10 @@ from tempfile import TemporaryDirectory as tempdir
 from conda.exports import download, hashsum_file
 
 config = {}
-versions = ['7.5', '8.0', '9.0', '9.1', '9.2', '10.0']
+versions = ['9.2'] #, '10.0', '10.1.1', '10.1.2']
 
 for v in versions:
-    config[v] = {'linux': {}, 'windows': {}, 'osx': {}}
+    config[v] = {'linux-ppc64le': {}, 'linux': {}, 'windows': {}, 'osx': {}}
 
 
 # The config dictionary looks like:
@@ -50,7 +50,7 @@ for v in versions:
 # defined install directory) and the DLL will be taken from that location.
 
 
-
+'''
 ######################
 ### CUDA 7.5 setup ###
 ######################
@@ -272,7 +272,7 @@ cu_91['osx'] = {'blob': 'cuda_9.1.85_mac',
                'nvvm_lib_fmt': 'lib{0}.3.2.0.dylib',
                'libdevice_lib_fmt': 'libdevice.{0}.bc'
                }
-
+'''
 ######################
 ### CUDA 9.2 setup ###
 ######################
@@ -338,6 +338,15 @@ cu_92['osx'] = {'blob': 'cuda_9.2.148_mac',
                'libdevice_lib_fmt': 'libdevice.{0}.bc'
                }
 
+cu_92['linux-ppc64le'] = {'blob': 'cuda-repo-ubuntu1604-9-2-local_9.2.148-1_ppc64el.deb',
+                 'patches': ['cuda-repo-ubuntu1604-9-2-148-local-patch-1_1.0-1_ppc64el.deb'],
+                 # need globs to handle symlinks
+                 'cuda_lib_fmt': 'lib{0}.so*',
+                 'nvtoolsext_fmt': 'lib{0}.so*',
+                 'nvvm_lib_fmt': 'lib{0}.so*',
+                 'libdevice_lib_fmt': 'libdevice.{0}.bc'
+                 }
+'''
 #######################
 ### CUDA 10.0 setup ###
 #######################
@@ -402,7 +411,7 @@ cu_10['osx'] = {'blob': 'cuda_10.0.130_mac',
                'nvvm_lib_fmt': 'lib{0}.3.3.0.dylib',
                'libdevice_lib_fmt': 'libdevice.{0}.bc'
                }
-
+'''
 
 class Extractor(object):
     """Extractor base class, platform specific extractors should inherit
@@ -411,7 +420,8 @@ class Extractor(object):
 
     libdir = {'linux': 'lib',
               'osx': 'lib',
-              'windows': 'Library/bin'}
+              'windows': 'Library/bin',
+              'linux-ppc64le': 'lib'}
 
     def __init__(self, version, ver_config, plt_config):
         """Initialise an instance:
@@ -669,6 +679,32 @@ class LinuxExtractor(Extractor):
                 check_call(cmd)
             self.copy(tmpd)
 
+class LinuxPpc64leExtractor(Extractor):
+    """The linux-ppc64le extractor
+    """
+
+    def copy(self, *args):
+        basepath = args[0]
+        self.copy_files(
+            cuda_lib_dir=os.path.join(
+                basepath, 'lib64'), nvvm_lib_dir=os.path.join(
+                basepath, 'nvvm', 'lib64'), libdevice_lib_dir=os.path.join(
+                basepath, 'nvvm', 'libdevice'))
+
+    def extract(self):
+        runfile = self.cu_blob
+        patches = self.patches
+        with tempdir() as tmpd:
+            cmd1 = ['ar', 'vx', os.path.join(self.src_dir, runfile)]
+            cmd2 = ['tar', 'data.tar.gz', '-C', tmpd]
+            check_call(cmd1)
+            check_call(cmd2)
+            for p in patches:
+                cmd1 = ['ar', 'vx', os.path.join(self.src_dir, p)]
+                cmd2 = ['tar', 'data.tar.gz', '-C', tmpd]
+                check_call(cmd1)
+                check_call(cmd2)
+            self.copy(tmpd)
 
 @contextmanager
 def _hdiutil_mount(mntpnt, image):
@@ -747,7 +783,8 @@ def getplatform():
 
 dispatcher = {'linux': LinuxExtractor,
               'windows': WindowsExtractor,
-              'osx': OsxExtractor}
+              'osx': OsxExtractor,
+              'linux-ppc64le': LinuxPpc64leExtractor}
 
 
 def _main():

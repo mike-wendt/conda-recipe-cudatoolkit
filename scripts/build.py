@@ -886,8 +886,11 @@ def _main():
     cu_version = os.environ['PKG_VERSION']
     # keep only the major.minor version (10.0) if micro (10.0.130) is present
     major_minor, micro = cu_version.rsplit('.', 1)
-    if '.' in major_minor:
+    if major_minor == "10.1":
+        # there are "updates" with 10.1 so we need 10.1.X specified
         cu_version = major_minor + '.' + micro[0]
+    elif '.' in major_minor:
+        cu_version = major_minor
 
     # get an extractor
     plat = getplatform()

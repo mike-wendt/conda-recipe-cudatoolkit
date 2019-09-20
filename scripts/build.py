@@ -15,7 +15,7 @@ from tempfile import TemporaryDirectory as tempdir
 from conda.exports import download, hashsum_file
 
 config = {}
-versions = ['7.5', '8.0', '9.0', '9.1', '9.2', '10.0']
+versions = ['7.5', '8.0', '9.0', '9.1', '9.2', '10.0', '10.1.1', '10.1.2']
 
 for v in versions:
     config[v] = {'linux': {}, 'windows': {}, 'osx': {}}
@@ -403,6 +403,135 @@ cu_10['osx'] = {'blob': 'cuda_10.0.130_mac',
                'libdevice_lib_fmt': 'libdevice.{0}.bc'
                }
 
+#########################
+### CUDA 10.1.1 setup ###
+#########################
+
+cu_1011 = config['10.1.1']
+cu_1011['base_url'] = "https://developer.nvidia.com/compute/cuda/10.1/Prod/"
+cu_1011['installers_url_ext'] = 'local_installers/'
+cu_1011['patch_url_ext'] = ''
+cu_1011['md5_url'] = "https://developer.download.nvidia.com/compute/cuda/10.1/Prod/docs2/sidebar/md5sum-2.txt"
+cu_1011['cuda_libraries'] = [
+    'cudart',
+    'cufft',
+    'cufftw',
+    'cublas',
+    'cusparse',
+    'cusolver',
+    'curand',
+    'nppc',
+    'nppial',
+    'nppicc',
+    'nppicom',
+    'nppidei',
+    'nppif',
+    'nppig',
+    'nppim',
+    'nppist',
+    'nppisu',
+    'nppitc',
+    'npps',
+    'nvblas',
+    'nvgraph',
+    'nvrtc',
+    'nvrtc-builtins',
+    'nvToolsExt',
+]
+cu_1011['libdevice_versions'] = ['10']
+
+cu_1011['linux'] = {'blob': 'cuda_10.1.168_418.67_linux.run',
+                 'patches': [],
+                 # need globs to handle symlinks
+                 'cuda_lib_fmt': 'lib{0}.so*',
+                 'nvtoolsext_fmt': 'lib{0}.so*',
+                 'nvvm_lib_fmt': 'lib{0}.so*',
+                 'libdevice_lib_fmt': 'libdevice.{0}.bc'
+                 }
+
+cu_1011['windows'] = {'blob': 'cuda_10.1.168_425.25_win10.exe',
+                   'patches': [],
+                   'cuda_lib_fmt': '{0}64_100*.dll',
+                   'nvtoolsext_fmt': '{0}64_1.dll',
+                   'nvvm_lib_fmt': '{0}64_33_0.dll',
+                   'libdevice_lib_fmt': 'libdevice.{0}.bc',
+                   'NvToolsExtPath' :
+                       os.path.join('c:' + os.sep, 'Program Files',
+                                    'NVIDIA Corporation', 'NVToolsExt', 'bin')
+                   }
+
+cu_1011['osx'] = {'blob': 'cuda_10.1.168_mac.dmg',
+               'patches': [],
+               'cuda_lib_fmt': 'lib{0}.10.0.dylib',
+               'nvtoolsext_fmt': 'lib{0}.1.dylib',
+               'nvvm_lib_fmt': 'lib{0}.3.3.0.dylib',
+               'libdevice_lib_fmt': 'libdevice.{0}.bc'
+               }
+
+#########################
+### CUDA 10.1.2 setup ###
+#########################
+
+cu_1012 = config['10.1.2']
+cu_1012['base_url'] = "https://developer.nvidia.com/compute/cuda/10.1/Prod/"
+cu_1012['installers_url_ext'] = 'local_installers/'
+cu_1012['patch_url_ext'] = ''
+cu_1012['md5_url'] = "https://developer.download.nvidia.com/compute/cuda/10.1/Prod/docs3/sidebar/md5sum.txt"
+cu_1012['cuda_libraries'] = [
+    'cudart',
+    'cufft',
+    'cufftw',
+    'cublas',
+    'cusparse',
+    'cusolver',
+    'curand',
+    'nppc',
+    'nppial',
+    'nppicc',
+    'nppicom',
+    'nppidei',
+    'nppif',
+    'nppig',
+    'nppim',
+    'nppist',
+    'nppisu',
+    'nppitc',
+    'npps',
+    'nvblas',
+    'nvgraph',
+    'nvrtc',
+    'nvrtc-builtins',
+    'nvToolsExt',
+]
+cu_1012['libdevice_versions'] = ['10']
+
+cu_1012['linux'] = {'blob': 'cuda_10.1.243_418.87.00_linux.run',
+                 'patches': [],
+                 # need globs to handle symlinks
+                 'cuda_lib_fmt': 'lib{0}.so*',
+                 'nvtoolsext_fmt': 'lib{0}.so*',
+                 'nvvm_lib_fmt': 'lib{0}.so*',
+                 'libdevice_lib_fmt': 'libdevice.{0}.bc'
+                 }
+
+cu_1012['windows'] = {'blob': 'cuda_10.1.243_426.00_win10.exe',
+                   'patches': [],
+                   'cuda_lib_fmt': '{0}64_100*.dll',
+                   'nvtoolsext_fmt': '{0}64_1.dll',
+                   'nvvm_lib_fmt': '{0}64_33_0.dll',
+                   'libdevice_lib_fmt': 'libdevice.{0}.bc',
+                   'NvToolsExtPath' :
+                       os.path.join('c:' + os.sep, 'Program Files',
+                                    'NVIDIA Corporation', 'NVToolsExt', 'bin')
+                   }
+
+cu_1012['osx'] = {'blob': 'cuda_10.1.243_mac.dmg',
+               'patches': [],
+               'cuda_lib_fmt': 'lib{0}.10.0.dylib',
+               'nvtoolsext_fmt': 'lib{0}.1.dylib',
+               'nvvm_lib_fmt': 'lib{0}.3.3.0.dylib',
+               'libdevice_lib_fmt': 'libdevice.{0}.bc'
+               }
 
 class Extractor(object):
     """Extractor base class, platform specific extractors should inherit
@@ -758,7 +887,7 @@ def _main():
     # keep only the major.minor version (10.0) if micro (10.0.130) is present
     major_minor, micro = cu_version.rsplit('.', 1)
     if '.' in major_minor:
-        cu_version = major_minor
+        cu_version = major_minor + '.' + micro[0]
 
     # get an extractor
     plat = getplatform()

@@ -281,7 +281,7 @@ cu_92 = config['9.2']
 cu_92['base_url'] = "https://developer.nvidia.com/compute/cuda/9.2/Prod2/"
 cu_92['installers_url_ext'] = 'local_installers/'
 cu_92['patch_url_ext'] = 'patches/1/'
-cu_92['md5_url'] = "http://developer.download.nvidia.com/compute/cuda/9.2/Prod2/docs/sidebar/md5sum.txt"
+cu_92['md5_url'] = "http://developer.download.nvidia.com/compute/cuda/9.2/Prod2/docs/sidebar/md5sum-d.txt"
 cu_92['cuda_libraries'] = [
     'cudart',
     'cufft',
@@ -338,8 +338,8 @@ cu_92['osx'] = {'blob': 'cuda_9.2.148_mac',
                'libdevice_lib_fmt': 'libdevice.{0}.bc'
                }
 
-cu_92['linux-ppc64le'] = {'blob': 'cuda-repo-ubuntu1604-9-2-local_9.2.148-1_ppc64el.deb',
-                 'patches': ['cuda-repo-ubuntu1604-9-2-148-local-patch-1_1.0-1_ppc64el.deb'],
+cu_92['linux-ppc64le'] = {'blob': 'cuda-repo-ubuntu1604-9-2-local_9.2.148-1_ppc64el',
+                 'patches': ['cuda-repo-ubuntu1604-9-2-148-local-patch-1_1.0-1_ppc64el'],
                  # need globs to handle symlinks
                  'cuda_lib_fmt': 'lib{0}.so*',
                  'nvtoolsext_fmt': 'lib{0}.so*',
@@ -695,15 +695,32 @@ class LinuxPpc64leExtractor(Extractor):
         runfile = self.cu_blob
         patches = self.patches
         with tempdir() as tmpd:
+            extract_name = '__extracted'
+            extractdir = os.path.join(tmpd, extract_name)
+            os.mkdir(extract_name)
+            os.mkdir(os.path.join('ppc64le-deb'))
+            os.chdir(os.path.join('ppc64le-deb'))
+            cmd0 = ['cp', os.path.join(self.src_dir, runfile), '.']
             cmd1 = ['ar', 'vx', os.path.join(self.src_dir, runfile)]
-            cmd2 = ['tar', 'data.tar.gz', '-C', tmpd]
+            cmd2 = ['xz', '-d', 'data.tar.xz']
+            cmd3 = ['tar', 'xvf', 'data.tar', '-C', tmpd]
+            check_call(cmd0)
             check_call(cmd1)
             check_call(cmd2)
+            check_call(cmd3)
             for p in patches:
+                os.mkdir(os.path.join('ppc64le-patch'))
+                os.chdir(os.path.join('ppc64le-patch'))
+                cmd0 = ['cp', os.path.join(self.src_dir, p), '.']
                 cmd1 = ['ar', 'vx', os.path.join(self.src_dir, p)]
-                cmd2 = ['tar', 'data.tar.gz', '-C', tmpd]
+                cmd2 = ['xz', '-d', 'data.tar.xz']
+                cmd3 = ['tar', 'xvf', 'data.tar', '-C', tmpd]
+                check_call(cmd0)
                 check_call(cmd1)
                 check_call(cmd2)
+                check_call(cmd3)
+                check_call(cmd4)
+                check_call(cmd5)
             self.copy(tmpd)
 
 @contextmanager
@@ -773,7 +790,7 @@ class OsxExtractor(Extractor):
 def getplatform():
     plt = sys.platform
     if plt.startswith('linux'):
-        return 'linux'
+        return 'linux-ppc64le'
     elif plt.startswith('win'):
         return 'windows'
     elif plt.startswith('darwin'):

@@ -337,6 +337,16 @@ cu_92['osx'] = {'blob': 'cuda_9.2.148_mac',
                'nvvm_lib_fmt': 'lib{0}.3.2.0.dylib',
                'libdevice_lib_fmt': 'libdevice.{0}.bc'
                }
+cu_92['linux-ppc64le'] = {'blob': 'cuda92.tgz',
+                 'patches': [],
+                 # need globs to handle symlinks
+                 'cuda_lib_fmt': 'lib{0}.so*',
+                 'nvtoolsext_fmt': 'lib{0}.so*',
+                 'nvvm_lib_fmt': 'lib{0}.so*',
+                 'libdevice_lib_fmt': 'libdevice.{0}.bc',
+                 'base_url':'https://gpuci-public.s3.us-east-2.amazonaws.com/static-host/cuda-ppc64le/',
+                 'installers_url_ext': None
+                 }
 
 #######################
 ### CUDA 10.0 setup ###
@@ -402,6 +412,16 @@ cu_10['osx'] = {'blob': 'cuda_10.0.130_mac',
                'nvvm_lib_fmt': 'lib{0}.3.3.0.dylib',
                'libdevice_lib_fmt': 'libdevice.{0}.bc'
                }
+cu_10['linux-ppc64le'] = {'blob': 'cuda100.tgz',
+                 'patches': [],
+                 # need globs to handle symlinks
+                 'cuda_lib_fmt': 'lib{0}.so*',
+                 'nvtoolsext_fmt': 'lib{0}.so*',
+                 'nvvm_lib_fmt': 'lib{0}.so*',
+                 'libdevice_lib_fmt': 'libdevice.{0}.bc',
+                 'base_url':'https://gpuci-public.s3.us-east-2.amazonaws.com/static-host/cuda-ppc64le/',
+                 'installers_url_ext': None
+                 }
 
 
 class Extractor(object):
@@ -411,7 +431,8 @@ class Extractor(object):
 
     libdir = {'linux': 'lib',
               'osx': 'lib',
-              'windows': 'Library/bin'}
+              'windows': 'Library/bin',
+              'linux-ppc64le': 'lib'}
 
     def __init__(self, version, ver_config, plt_config):
         """Initialise an instance:
@@ -438,7 +459,7 @@ class Extractor(object):
         self.prefix = os.environ['PREFIX']
         self.src_dir = os.environ['SRC_DIR']
         self.output_dir = os.path.join(self.prefix, self.libdir[getplatform()])
-        self.symlinks = getplatform() == 'linux'
+        self.symlinks = getplatform().startswith('linux')
         self.debug_install_path = os.environ.get('DEBUG_INSTALLER_PATH')
 
         try:
@@ -733,11 +754,42 @@ class OsxExtractor(Extractor):
                         shutil.copy(os.path.join(path, filename), store)
             self.copy(tmpd, store)
 
+class LinuxPPC64leExtractor(Extractor):
+
+    def __init__(self, version, ver_config, plt_config):
+        super().__init__(version, ver_config, plt_config)
+        if 'base_url' in plt_config:
+            self.base_url=plt_config['base_url']
+        if 'installers_url_ext' in plt_config:
+            self.installers_url_ext = plt_config['installers_url_ext']
+
+    def check_md5(self):
+        pass
+
+    def copy(self, *args):
+        basepath = args[0]
+        basepath = os.path.join(basepath, 'usr', 'local','cuda-{}'.format(self.cu_version))
+        self.copy_files(
+            cuda_lib_dir=os.path.join(basepath,'targets', 'ppc64le-linux', 'lib'), 
+            nvvm_lib_dir=os.path.join(basepath, 'nvvm', 'lib64'), 
+            libdevice_lib_dir=os.path.join(basepath, 'nvvm', 'libdevice'))
+
+    def extract(self):
+        tarfile = self.cu_blob
+        with tempdir() as tmpd:
+            cmd = ['tar', '-C', tmpd, '-x', '-f', os.path.join(self.src_dir, tarfile)]
+            check_call(cmd)
+            self.copy(tmpd)
+
+
 
 def getplatform():
-    plt = sys.platform
+    plt = os.environ.get('SYS_PLATFORM', sys.platform)
     if plt.startswith('linux'):
-        return 'linux'
+        if 'ppc64le' in plt:
+            return 'linux-ppc64le'
+        else:
+            return 'linux'
     elif plt.startswith('win'):
         return 'windows'
     elif plt.startswith('darwin'):
@@ -747,7 +799,8 @@ def getplatform():
 
 dispatcher = {'linux': LinuxExtractor,
               'windows': WindowsExtractor,
-              'osx': OsxExtractor}
+              'osx': OsxExtractor,
+              'linux-ppc64le': LinuxPPC64leExtractor}
 
 
 def _main():

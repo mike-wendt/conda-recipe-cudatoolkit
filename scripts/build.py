@@ -590,6 +590,7 @@ class Extractor(object):
           plt_config - the configuration for this platform
         """
         self.cu_version = version
+        self.cu_short_version = version
         self.md5_url = ver_config['md5_url']
         self.base_url = ver_config['base_url']
         self.patch_url_ext = ver_config['patch_url_ext']
@@ -916,7 +917,7 @@ class LinuxPPC64leExtractor(Extractor):
 
     def copy(self, *args):
         basepath = args[0]
-        basepath = os.path.join(basepath, 'usr', 'local','cuda-{}'.format(self.cu_version))
+        basepath = os.path.join(basepath, 'usr', 'local','cuda-{}'.format(self.cu_short_version))
         self.copy_files(
             cuda_lib_dir=os.path.join(basepath,'targets', 'ppc64le-linux', 'lib'), 
             nvvm_lib_dir=os.path.join(basepath, 'nvvm', 'lib64'), 
@@ -961,6 +962,7 @@ def _main():
     if major_minor == "10.1":
         # there are "updates" with 10.1 so we need 10.1.X specified
         cu_version = major_minor + '.' + micro[0]
+        cu_short_version = major_minor
     elif '.' in major_minor:
         cu_version = major_minor
 

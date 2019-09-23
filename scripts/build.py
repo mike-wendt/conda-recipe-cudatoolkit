@@ -917,7 +917,7 @@ class LinuxPPC64leExtractor(Extractor):
 
     def copy(self, *args):
         basepath = args[0]
-        basepath = os.path.join(basepath, 'usr', 'local','cuda-{}'.format(self.cu_short_version))
+        basepath = os.path.join(basepath, 'usr', 'local','cuda-{}'.format(self.cu_version))
         self.copy_files(
             cuda_lib_dir=os.path.join(basepath,'targets', 'ppc64le-linux', 'lib'), 
             nvvm_lib_dir=os.path.join(basepath, 'nvvm', 'lib64'), 
@@ -970,7 +970,7 @@ def _main():
     plat = getplatform()
     extractor_impl = dispatcher[plat]
     version_cfg = config[cu_version]
-    extractor = extractor_impl(cu_version, version_cfg, version_cfg[plat])
+    extractor = extractor_impl(cu_short_version, version_cfg, version_cfg[plat])
 
     # download binaries
     extractor.download_blobs()

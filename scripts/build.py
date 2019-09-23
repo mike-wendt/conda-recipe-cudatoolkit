@@ -473,7 +473,7 @@ cu_1011['osx'] = {'blob': 'cuda_10.1.168_mac.dmg',
 #########################
 
 cu_1012 = config['10.1.2']
-cu_1012['base_url'] = "https://developer.nvidia.com/compute/cuda/10.1/Prod/"
+cu_1012['base_url'] = "https://developer.download.nvidia.com/compute/cuda/10.1/Prod/"
 cu_1012['installers_url_ext'] = 'local_installers/'
 cu_1012['patch_url_ext'] = ''
 cu_1012['md5_url'] = "https://developer.download.nvidia.com/compute/cuda/10.1/Prod/docs3/sidebar/md5sum.txt"

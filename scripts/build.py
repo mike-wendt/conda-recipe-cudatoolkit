@@ -337,6 +337,7 @@ cu_92['osx'] = {'blob': 'cuda_9.2.148_mac',
                'nvvm_lib_fmt': 'lib{0}.3.2.0.dylib',
                'libdevice_lib_fmt': 'libdevice.{0}.bc'
                }
+
 cu_92['linux-ppc64le'] = {'blob': 'cuda92.tgz',
                  'patches': [],
                  # need globs to handle symlinks
@@ -412,6 +413,7 @@ cu_10['osx'] = {'blob': 'cuda_10.0.130_mac',
                'nvvm_lib_fmt': 'lib{0}.3.3.0.dylib',
                'libdevice_lib_fmt': 'libdevice.{0}.bc'
                }
+
 cu_10['linux-ppc64le'] = {'blob': 'cuda100.tgz',
                  'patches': [],
                  # need globs to handle symlinks
@@ -558,6 +560,17 @@ cu_1012['osx'] = {'blob': 'cuda_10.1.243_mac.dmg',
                'nvvm_lib_fmt': 'lib{0}.3.3.0.dylib',
                'libdevice_lib_fmt': 'libdevice.{0}.bc'
                }
+
+cu_1012['linux-ppc64le'] = {'blob': 'cuda101.tgz',
+                 'patches': [],
+                 # need globs to handle symlinks
+                 'cuda_lib_fmt': 'lib{0}.so*',
+                 'nvtoolsext_fmt': 'lib{0}.so*',
+                 'nvvm_lib_fmt': 'lib{0}.so*',
+                 'libdevice_lib_fmt': 'libdevice.{0}.bc',
+                 'base_url':'https://gpuci-public.s3.us-east-2.amazonaws.com/static-host/cuda-ppc64le/',
+                 'installers_url_ext': None
+                 }
 
 class Extractor(object):
     """Extractor base class, platform specific extractors should inherit

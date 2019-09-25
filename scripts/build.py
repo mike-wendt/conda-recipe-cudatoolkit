@@ -561,15 +561,13 @@ cu_1012['osx'] = {'blob': 'cuda_10.1.243_mac.dmg',
                'libdevice_lib_fmt': 'libdevice.{0}.bc'
                }
 
-cu_1012['linux-ppc64le'] = {'blob': 'cuda101.tgz',
+cu_1012['linux-ppc64le'] = {'blob': '',
                  'patches': [],
                  # need globs to handle symlinks
                  'cuda_lib_fmt': 'lib{0}.so*',
                  'nvtoolsext_fmt': 'lib{0}.so*',
                  'nvvm_lib_fmt': 'lib{0}.so*',
-                 'libdevice_lib_fmt': 'libdevice.{0}.bc',
-                 'base_url':'https://gpuci-public.s3.us-east-2.amazonaws.com/static-host/cuda-ppc64le/',
-                 'installers_url_ext': None
+                 'libdevice_lib_fmt': 'libdevice.{0}.bc'
                  }
 
 class Extractor(object):
@@ -904,31 +902,25 @@ class OsxExtractor(Extractor):
             self.copy(tmpd, store)
 
 class LinuxPPC64leExtractor(Extractor):
+    """The linux-ppc64le extractor
+       
+       Pulls data from docker container that it is running in
 
-    def __init__(self, version, ver_config, plt_config):
-        super().__init__(version, ver_config, plt_config)
-        if 'base_url' in plt_config:
-            self.base_url=plt_config['base_url']
-        if 'installers_url_ext' in plt_config:
-            self.installers_url_ext = plt_config['installers_url_ext']
+    """
 
     def check_md5(self):
         pass
 
     def copy(self, *args):
         basepath = args[0]
-        basepath = os.path.join(basepath, 'usr', 'local','cuda-{}'.format(self.cu_version))
         self.copy_files(
             cuda_lib_dir=os.path.join(basepath,'targets', 'ppc64le-linux', 'lib'), 
             nvvm_lib_dir=os.path.join(basepath, 'nvvm', 'lib64'), 
             libdevice_lib_dir=os.path.join(basepath, 'nvvm', 'libdevice'))
 
     def extract(self):
-        tarfile = self.cu_blob
-        with tempdir() as tmpd:
-            cmd = ['tar', '-C', tmpd, '-x', '-f', os.path.join(self.src_dir, tarfile)]
-            check_call(cmd)
-            self.copy(tmpd)
+        basepath = os.path.join(os.sep, 'usr', 'local','cuda-{}'.format(self.cu_version))
+        self.copy(basepath)
 
 
 

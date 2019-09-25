@@ -911,6 +911,9 @@ class LinuxPPC64leExtractor(Extractor):
     def check_md5(self):
         pass
 
+    def check_md5(self):
+        pass
+
     def copy(self, *args):
         basepath = args[0]
         self.copy_files(

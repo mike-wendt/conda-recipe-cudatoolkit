@@ -908,7 +908,7 @@ class LinuxPPC64leExtractor(Extractor):
 
     """
 
-    def check_md5(self):
+    def download_blobs(self):
         pass
 
     def check_md5(self):

@@ -790,7 +790,7 @@ class LinuxExtractor(Extractor):
         with tempdir() as tmpd:
             if self.cu_version == "10.1":
                 cmd = [os.path.join(self.src_dir, runfile),
-                        '--installpath='+tmpd, '--toolkit', '--silent']
+                        '--installpath='+tmpd, '--toolkit', '--silent', '--override']
             else:
                 cmd = [os.path.join(self.src_dir, runfile),
                         '--toolkitpath', tmpd, '--toolkit', '--silent']

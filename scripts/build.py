@@ -788,12 +788,20 @@ class LinuxExtractor(Extractor):
         patches = self.patches
         os.chmod(runfile, 0o777)
         with tempdir() as tmpd:
-            cmd = [os.path.join(self.src_dir, runfile),
+            if self.cu_version == "10.1":
+                cmd = [os.path.join(self.src_dir, runfile),
+                        '--installpath='+tmpd, '--toolkit', '--silent']
+            else:
+                cmd = [os.path.join(self.src_dir, runfile),
                         '--toolkitpath', tmpd, '--toolkit', '--silent']
             check_call(cmd)
             for p in patches:
                 os.chmod(p, 0o777)
-                cmd = [os.path.join(self.src_dir, p),
+                if self.cu_version == "10.1":
+                    cmd = [os.path.join(self.src_dir, runfile),
+                            '--installdir='+tmpd, '--accept-eula', '--silent']
+                else:
+                    cmd = [os.path.join(self.src_dir, p),
                             '--installdir', tmpd, '--accept-eula', '--silent']
                 check_call(cmd)
             self.copy(tmpd)

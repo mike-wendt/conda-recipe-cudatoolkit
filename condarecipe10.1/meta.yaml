@@ -1,7 +1,7 @@
 package:
    name: cudatoolkit
    # match the package version to the libcudart.so version
-   version: 10.1.168
+   version: 10.1.243
 
 build:
   number: 0

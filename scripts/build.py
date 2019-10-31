@@ -405,7 +405,7 @@ cu_10['osx'] = {'blob': 'cuda_10.0.130_mac',
 
 
 #######################
-### CUDA 10.1 setup ###
+### CUDA 10.1 (update 2) setup ###
 #######################
 
 cu_101 = config['10.1']
@@ -446,8 +446,8 @@ if sys.platform.startswith('linux'):
 cu_101['libdevice_versions'] = ['10']
 
 cu_101['linux'] = {
-    'blob': 'cuda_10.1.168_418.67_rhel6.run',
-    'embedded_blob': 'cuda-linux.10.1.168-26218862.run',
+    'blob': 'cuda_10.1.243_418.87.00_rhel6.run',
+    'embedded_blob': 'cuda-linux.10.1.243-26907403.run',
     'patches': [],
     # need globs to handle symlinks
     'cuda_lib_fmt': 'lib{0}.so*',
@@ -456,7 +456,7 @@ cu_101['linux'] = {
     'libdevice_lib_fmt': 'libdevice.{0}.bc'
 }
 
-cu_101['windows'] = {'blob': 'cuda_10.1.168_425.25_windows.exe',
+cu_101['windows'] = {'blob': 'cuda_10.1.243_426.00_windows.exe',
                    'patches': [],
                    'cuda_lib_fmt': '{0}64_10*.dll',
                    'nvtoolsext_fmt': '{0}64_1.dll',
@@ -467,7 +467,7 @@ cu_101['windows'] = {'blob': 'cuda_10.1.168_425.25_windows.exe',
                                     'NVIDIA Corporation', 'NVToolsExt', 'bin')
                    }
 
-cu_101['osx'] = {'blob': 'cuda_10.1.168_mac',
+cu_101['osx'] = {'blob': 'cuda_10.1.243_mac',
                'patches': [],
                'cuda_lib_fmt': 'lib{0}.10.1.dylib',
                'nvtoolsext_fmt': 'lib{0}.1.dylib',

@@ -5,8 +5,15 @@ package:
 
 build:
   number: 0
-  script_env:
-    - NVTOOLSEXT_INSTALL_PATH
+  # script_env:
+  #   - NVTOOLSEXT_INSTALL_PATH
+  missing_dso_whitelist:
+    - "$RPATH/libdl.so.2"
+    - "$RPATH/libpthread.so.0"
+    - "$RPATH/libc.so.6"
+    - "$RPATH/librt.so.1"
+    - "$RPATH/ld-linux-x86-64.so.2"
+    - "$RPATH/libm.so.6"
 
 requirements:
   build:
@@ -15,6 +22,8 @@ requirements:
     - 7za # [win]
     - conda
     - pyyaml
+    # for run_exports
+    - {{ compiler('cxx') }}
 
 source:
     path: .

@@ -12,7 +12,41 @@ from pathlib import Path
 from subprocess import check_call
 from tempfile import TemporaryDirectory as tempdir
 
-from conda.exports import download, hashsum_file
+import requests
+from tqdm import tqdm
+import os
+
+def download_from_url(url, dst):
+    """
+    @param: url to download file
+    @param: dst place to put the file
+    """
+    file_size = int(requests.head(url).headers["Content-Length"])
+    if os.path.exists(dst):
+        first_byte = os.path.getsize(dst)
+    else:
+        first_byte = 0
+    if first_byte >= file_size:
+        return file_size
+    header = {"Range": "bytes=%s-%s" % (first_byte, file_size)}
+    pbar = tqdm(
+        total=file_size, initial=first_byte,
+        unit='B', unit_scale=True, desc=url.split('/')[-1])
+    req = requests.get(url, headers=header, stream=True)
+    with(open(dst, 'ab')) as f:
+        for chunk in req.iter_content(chunk_size=1024):
+            if chunk:
+                f.write(chunk)
+                pbar.update(1024)
+        pbar.close()
+    return file_size
+
+def md5(fname):
+    hash_md5 = hashlib.md5()
+    with open(fname, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
 
 # The config dictionary looks like:
 # config[cuda_version(s)...]
@@ -167,7 +201,7 @@ class Extractor(object):
         dl_path = os.path.join(self.src_dir, self.config_blob)
         if not self.debug_install_path:
             print("downloading %s to %s" % (dl_url, dl_path))
-            download(dl_url, dl_path)
+            download_from_url(dl_url, dl_path)
         else:
             existing_file = os.path.join(self.debug_install_path, self.config_blob)
             print("DEBUG: copying %s to %s" % (existing_file, dl_path))
@@ -179,7 +213,7 @@ class Extractor(object):
             dl_path = os.path.join(self.src_dir, p)
             if not self.debug_install_path:
                 print("downloading %s to %s" % (dl_url, dl_path))
-                download(dl_url, dl_path)
+                download_from_url(dl_url, dl_path)
             else:
                 existing_file = os.path.join(self.debug_install_path, p)
                 print("DEBUG: copying %s to %s" % (existing_file, dl_path))
@@ -190,11 +224,11 @@ class Extractor(object):
         """
         md5file = self.md5_url.split('/')[-1]
         path = os.path.join(self.src_dir, md5file)
-        download(self.md5_url, path)
+        download_from_url(self.md5_url, path)
 
         # compute hash of blob
         blob_path = os.path.join(self.src_dir, self.config_blob)
-        md5sum = hashsum_file(blob_path, 'md5')
+        md5sum = md5(blob_path)
 
         # get checksums
         with open(md5file, 'r') as f:

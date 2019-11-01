@@ -17,11 +17,11 @@ build:
 
 requirements:
   build:
-    - python >=3.7
-    - requests
     - 7za # [win]
-    - conda
+    - python >=3.7
     - pyyaml
+    - requests
+    - tqdm
     # for run_exports
     - {{ compiler('cxx') }}
 

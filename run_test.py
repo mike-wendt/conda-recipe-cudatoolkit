@@ -18,11 +18,7 @@ def run_test():
     gotlib = get_cudalib('cublas')
     # check cufft b/c cublas has an incorrect version in 10.1 update 1
     gotlib = get_cudalib('cufft')
-    lookfor = os.environ['PKG_VERSION']
-    if sys.platform.startswith('win'):
-        # windows libs have no dot
-        lookfor = lookfor.replace('.', '')
-    return lookfor in gotlib
+    return bool(get_cudalib('cublas')) and bool(get_cudalib('cufft'))
 
 
 sys.exit(0 if run_test() else 1)

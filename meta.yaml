@@ -31,3 +31,5 @@ source:
 test:
   requires:
     - numba
+    - python >=3.7
+    - setuptools  # for pkg_resources

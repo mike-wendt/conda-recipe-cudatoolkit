@@ -14,13 +14,6 @@ from tempfile import TemporaryDirectory as tempdir
 
 from conda.exports import download, hashsum_file
 
-config = {}
-versions = ['7.5', '8.0', '9.0', '9.1', '9.2', '10.0', '10.1']
-
-for v in versions:
-    config[v] = {'linux': {}, 'windows': {}, 'osx': {}}
-
-
 # The config dictionary looks like:
 # config[cuda_version(s)...]
 #
@@ -50,370 +43,17 @@ for v in versions:
 # defined install directory) and the DLL will be taken from that location.
 
 
-
-######################
-### CUDA 7.5 setup ###
-######################
-
-cu_75 = config['7.5']
-cu_75['base_url'] = "http://developer.download.nvidia.com/compute/cuda/7.5/Prod/"
-cu_75['patch_url_ext'] = ''
-cu_75['installers_url_ext'] = 'local_installers/'
-cu_75['md5_url'] = "http://developer.download.nvidia.com/compute/cuda/7.5/Prod/docs/sidebar/md5sum.txt"
-cu_75['cuda_libraries'] = [
-    'cublas',
-    'cudart',
-    'cufft',
-    'curand',
-    'cusparse',
-    'cusolver',
-    'nppc',
-    'nppi',
-    'npps',
-    'nvrtc-builtins',
-    'nvrtc',
-]
-cu_75['libdevice_versions'] = ['20.10', '30.10', '35.10', '50.10']
-
-cu_75['linux'] = {'blob': 'cuda_7.5.18_linux.run',
-                  'patches': [],
-                  'cuda_lib_fmt': 'lib{0}.so.7.5',
-                  'nvvm_lib_fmt': 'lib{0}.so.3.0.0',
-                  'libdevice_lib_fmt': 'libdevice.compute_{0}.bc'
-                  }
-
-cu_75['windows'] = {'blob': 'cuda_7.5.18_win10.exe',
-                    'patches': [],
-                    'cuda_lib_fmt': '{0}64_75.dll',
-                    'nvvm_lib_fmt': '{0}64_30_0.dll',
-                    'libdevice_lib_fmt': 'libdevice.compute_{0}.bc'
-                    }
-
-cu_75['osx'] = {'blob': 'cuda_7.5.27_mac.dmg',
-                'patches': [],
-                'cuda_lib_fmt': 'lib{0}.7.5.dylib',
-                'nvvm_lib_fmt': 'lib{0}.3.0.0.dylib',
-                'libdevice_lib_fmt': 'libdevice.compute_{0}.bc'
-                }
-
-######################
-### CUDA 8.0 setup ###
-######################
-
-cu_8 = config['8.0']
-cu_8['base_url'] = "https://developer.nvidia.com/compute/cuda/8.0/Prod2/"
-cu_8['installers_url_ext'] = 'local_installers/'
-cu_8['patch_url_ext'] = 'patches/2/'
-cu_8['md5_url'] = "https://developer.nvidia.com/compute/cuda/8.0/Prod2/docs/sidebar/md5sum-txt"
-cu_8['cuda_libraries'] = [
-    'cudart',
-    'cufft',
-    'cublas',
-    'cusparse',
-    'cusolver',
-    'curand',
-    'nppc',
-    'nppi',
-    'npps',
-    'nvrtc',
-    'nvrtc-builtins',
-    'nvToolsExt',
-]
-cu_8['libdevice_versions'] = ['20.10', '30.10', '35.10', '50.10']
-
-cu_8['linux'] = {'blob': 'cuda_8.0.61_375.26_linux-run',
-                 'patches': ['cuda_8.0.61.2_linux-run'],
-                 # need globs to handle symlinks
-                 'cuda_lib_fmt': 'lib{0}.so*',
-                 'nvtoolsext_fmt': 'lib{0}.so*',
-                 'nvvm_lib_fmt': 'lib{0}.so*',
-                 'libdevice_lib_fmt': 'libdevice.compute_{0}.bc'
-                 }
-
-cu_8['windows'] = {'blob': 'cuda_8.0.61_windows-exe',
-                   'patches': ['cuda_8.0.61.2_windows-exe'],
-                   'cuda_lib_fmt': '{0}64_80.dll',
-                   'nvtoolsext_fmt': '{0}64_1.dll',
-                   'nvvm_lib_fmt': '{0}64_31_0.dll',
-                   'libdevice_lib_fmt': 'libdevice.compute_{0}.bc',
-                   'NvToolsExtPath' :
-                       os.path.join('c:' + os.sep, 'Program Files',
-                                    'NVIDIA Corporation', 'NVToolsExt', 'bin')
-                   }
-
-cu_8['osx'] = {'blob': 'cuda_8.0.61_mac-dmg',
-               'patches': ['cuda_8.0.61.2_mac-dmg'],
-               'cuda_lib_fmt': 'lib{0}.8.0.dylib',
-               'nvtoolsext_fmt': 'lib{0}.1.dylib',
-               'nvvm_lib_fmt': 'lib{0}.3.1.0.dylib',
-               'libdevice_lib_fmt': 'libdevice.compute_{0}.bc'
-               }
-
-######################
-### CUDA 9.0 setup ###
-######################
-
-cu_9 = config['9.0']
-cu_9['base_url'] = "https://developer.nvidia.com/compute/cuda/9.0/Prod/"
-cu_9['installers_url_ext'] = 'local_installers/'
-cu_9['patch_url_ext'] = ''
-cu_9['md5_url'] = "http://developer.download.nvidia.com/compute/cuda/9.0/Prod/docs/sidebar/md5sum.txt"
-cu_9['cuda_libraries'] = [
-    'cudart',
-    'cufft',
-    'cublas',
-    'cusparse',
-    'cusolver',
-    'curand',
-    'nppc',
-    'nppial',
-    'nppicc',
-    'nppicom',
-    'nppidei',
-    'nppif',
-    'nppig',
-    'nppim',
-    'nppist',
-    'nppisu',
-    'nppitc',
-    'npps',
-    'nvrtc',
-    'nvrtc-builtins',
-    'nvToolsExt',
-]
-cu_9['libdevice_versions'] = ['10']
-
-cu_9['linux'] = {'blob': 'cuda_9.0.176_384.81_linux-run',
-                 'patches': [],
-                 # need globs to handle symlinks
-                 'cuda_lib_fmt': 'lib{0}.so*',
-                 'nvtoolsext_fmt': 'lib{0}.so*',
-                 'nvvm_lib_fmt': 'lib{0}.so*',
-                 'libdevice_lib_fmt': 'libdevice.{0}.bc'
-                 }
-
-cu_9['windows'] = {'blob': 'cuda_9.0.176_windows-exe',
-                   'patches': [],
-                   'cuda_lib_fmt': '{0}64_90.dll',
-                   'nvtoolsext_fmt': '{0}64_1.dll',
-                   'nvvm_lib_fmt': '{0}64_32_0.dll',
-                   'libdevice_lib_fmt': 'libdevice.{0}.bc',
-                   'NvToolsExtPath' :
-                       os.path.join('c:' + os.sep, 'Program Files',
-                                    'NVIDIA Corporation', 'NVToolsExt', 'bin')
-                   }
-
-cu_9['osx'] = {'blob': 'cuda_9.0.176_mac-dmg',
-               'patches': [],
-               'cuda_lib_fmt': 'lib{0}.9.0.dylib',
-               'nvtoolsext_fmt': 'lib{0}.1.dylib',
-               'nvvm_lib_fmt': 'lib{0}.3.2.0.dylib',
-               'libdevice_lib_fmt': 'libdevice.{0}.bc'
-               }
-
-######################
-### CUDA 9.1 setup ###
-######################
-
-cu_91 = config['9.1']
-cu_91['base_url'] = "https://developer.nvidia.com/compute/cuda/9.1/Prod/"
-cu_91['installers_url_ext'] = 'local_installers/'
-cu_91['patch_url_ext'] = ''
-cu_91['md5_url'] = "http://developer.download.nvidia.com/compute/cuda/9.1/Prod/docs/sidebar/md5sum.txt"
-cu_91['cuda_libraries'] = [
-    'cudart',
-    'cufft',
-    'cublas',
-    'cusparse',
-    'cusolver',
-    'curand',
-    'nppc',
-    'nppial',
-    'nppicc',
-    'nppicom',
-    'nppidei',
-    'nppif',
-    'nppig',
-    'nppim',
-    'nppist',
-    'nppisu',
-    'nppitc',
-    'npps',
-    'nvrtc',
-    'nvrtc-builtins',
-    'nvToolsExt',
-]
-cu_91['libdevice_versions'] = ['10']
-
-cu_91['linux'] = {'blob': 'cuda_9.1.85_387.26_linux',
-                 'patches': [],
-                 # need globs to handle symlinks
-                 'cuda_lib_fmt': 'lib{0}.so*',
-                 'nvtoolsext_fmt': 'lib{0}.so*',
-                 'nvvm_lib_fmt': 'lib{0}.so*',
-                 'libdevice_lib_fmt': 'libdevice.{0}.bc'
-                 }
-
-cu_91['windows'] = {'blob': 'cuda_9.1.85_windows',
-                   'patches': [],
-                   'cuda_lib_fmt': '{0}64_91.dll',
-                   'nvtoolsext_fmt': '{0}64_1.dll',
-                   'nvvm_lib_fmt': '{0}64_32_0.dll',
-                   'libdevice_lib_fmt': 'libdevice.{0}.bc',
-                   'NvToolsExtPath' :
-                       os.path.join('c:' + os.sep, 'Program Files',
-                                    'NVIDIA Corporation', 'NVToolsExt', 'bin')
-                   }
-
-cu_91['osx'] = {'blob': 'cuda_9.1.85_mac',
-               'patches': [],
-               'cuda_lib_fmt': 'lib{0}.9.1.dylib',
-               'nvtoolsext_fmt': 'lib{0}.1.dylib',
-               'nvvm_lib_fmt': 'lib{0}.3.2.0.dylib',
-               'libdevice_lib_fmt': 'libdevice.{0}.bc'
-               }
-
-######################
-### CUDA 9.2 setup ###
-######################
-
-cu_92 = config['9.2']
-cu_92['base_url'] = "https://developer.nvidia.com/compute/cuda/9.2/Prod2/"
-cu_92['installers_url_ext'] = 'local_installers/'
-cu_92['patch_url_ext'] = 'patches/1/'
-cu_92['md5_url'] = "http://developer.download.nvidia.com/compute/cuda/9.2/Prod2/docs/sidebar/md5sum.txt"
-cu_92['cuda_libraries'] = [
-    'cudart',
-    'cufft',
-    'cufftw',
-    'cublas',
-    'cusparse',
-    'cusolver',
-    'curand',
-    'nppc',
-    'nppial',
-    'nppicc',
-    'nppicom',
-    'nppidei',
-    'nppif',
-    'nppig',
-    'nppim',
-    'nppist',
-    'nppisu',
-    'nppitc',
-    'npps',
-    'nvblas',
-    'nvgraph',
-    'nvrtc',
-    'nvrtc-builtins',
-    'nvToolsExt',
-]
-cu_92['libdevice_versions'] = ['10']
-
-cu_92['linux'] = {'blob': 'cuda_9.2.148_396.37_linux',
-                 'patches': ['cuda_9.2.148.1_linux'],
-                 # need globs to handle symlinks
-                 'cuda_lib_fmt': 'lib{0}.so*',
-                 'nvtoolsext_fmt': 'lib{0}.so*',
-                 'nvvm_lib_fmt': 'lib{0}.so*',
-                 'libdevice_lib_fmt': 'libdevice.{0}.bc'
-                 }
-
-cu_92['windows'] = {'blob': 'cuda_9.2.148_windows',
-                   'patches': ['cuda_9.2.148.1_windows'],
-                   'cuda_lib_fmt': '{0}64_92.dll',
-                   'nvtoolsext_fmt': '{0}64_1.dll',
-                   'nvvm_lib_fmt': '{0}64_32_0.dll',
-                   'libdevice_lib_fmt': 'libdevice.{0}.bc',
-                   'NvToolsExtPath' :
-                       os.path.join('c:' + os.sep, 'Program Files',
-                                    'NVIDIA Corporation', 'NVToolsExt', 'bin')
-                   }
-
-cu_92['osx'] = {'blob': 'cuda_9.2.148_mac',
-               'patches': ['cuda_9.2.148.1_mac'],
-               'cuda_lib_fmt': 'lib{0}.9.2.dylib',
-               'nvtoolsext_fmt': 'lib{0}.1.dylib',
-               'nvvm_lib_fmt': 'lib{0}.3.2.0.dylib',
-               'libdevice_lib_fmt': 'libdevice.{0}.bc'
-               }
-
-#######################
-### CUDA 10.0 setup ###
-#######################
-
-cu_10 = config['10.0']
-cu_10['base_url'] = "https://developer.nvidia.com/compute/cuda/10.0/Prod/"
-cu_10['installers_url_ext'] = 'local_installers/'
-cu_10['patch_url_ext'] = ''
-cu_10['md5_url'] = "https://developer.download.nvidia.com/compute/cuda/10.0/Prod/docs/sidebar/md5sum.txt"
-cu_10['cuda_libraries'] = [
-    'cudart',
-    'cufft',
-    'cufftw',
-    'cublas',
-    'cusparse',
-    'cusolver',
-    'curand',
-    'nppc',
-    'nppial',
-    'nppicc',
-    'nppicom',
-    'nppidei',
-    'nppif',
-    'nppig',
-    'nppim',
-    'nppist',
-    'nppisu',
-    'nppitc',
-    'npps',
-    'nvblas',
-    'nvgraph',
-    'nvrtc',
-    'nvrtc-builtins',
-    'nvToolsExt',
-]
-cu_10['libdevice_versions'] = ['10']
-
-cu_10['linux'] = {'blob': 'cuda_10.0.130_410.48_linux',
-                 'patches': [],
-                 # need globs to handle symlinks
-                 'cuda_lib_fmt': 'lib{0}.so*',
-                 'nvtoolsext_fmt': 'lib{0}.so*',
-                 'nvvm_lib_fmt': 'lib{0}.so*',
-                 'libdevice_lib_fmt': 'libdevice.{0}.bc'
-                 }
-
-cu_10['windows'] = {'blob': 'cuda_10.0.130_411.31_windows',
-                   'patches': [],
-                   'cuda_lib_fmt': '{0}64_100*.dll',
-                   'nvtoolsext_fmt': '{0}64_1.dll',
-                   'nvvm_lib_fmt': '{0}64_33_0.dll',
-                   'libdevice_lib_fmt': 'libdevice.{0}.bc',
-                   'NvToolsExtPath' :
-                       os.path.join('c:' + os.sep, 'Program Files',
-                                    'NVIDIA Corporation', 'NVToolsExt', 'bin')
-                   }
-
-cu_10['osx'] = {'blob': 'cuda_10.0.130_mac',
-               'patches': [],
-               'cuda_lib_fmt': 'lib{0}.10.0.dylib',
-               'nvtoolsext_fmt': 'lib{0}.1.dylib',
-               'nvvm_lib_fmt': 'lib{0}.3.3.0.dylib',
-               'libdevice_lib_fmt': 'libdevice.{0}.bc'
-               }
-
-
 #######################
 ### CUDA 10.1 (update 2) setup ###
 #######################
 
-cu_101 = config['10.1']
-cu_101['base_url'] = "https://developer.nvidia.com/compute/cuda/10.1/Prod/"
-cu_101['installers_url_ext'] = 'local_installers/'
-cu_101['patch_url_ext'] = ''
-cu_101['md5_url'] = "https://developer.download.nvidia.com/compute/cuda/10.1/Prod/docs2/sidebar/md5sum.txt"
-cu_101['cuda_libraries'] = [
+maj_min = '10.1'
+config = {}
+config['base_url'] = f"http://developer.download.nvidia.com/compute/cuda/{maj_min}/Prod/"
+config['installers_url_ext'] = 'local_installers/'
+config['patch_url_ext'] = ''
+config['md5_url'] = f"{config['base_url']}/docs3/sidebar/md5sum.txt"
+config['cuda_libraries'] = [
     'cublas',
     'cublasLt',
     'cudart',
@@ -442,10 +82,10 @@ cu_101['cuda_libraries'] = [
 ]
 # nvjpeg is only available on linux
 if sys.platform.startswith('linux'):
-    cu_101['cuda_libraries'].append('nvjpeg')
-cu_101['libdevice_versions'] = ['10']
+    config['cuda_libraries'].append('nvjpeg')
+config['libdevice_versions'] = ['10']
 
-cu_101['linux'] = {
+config['linux'] = {
     'blob': 'cuda_10.1.243_418.87.00_rhel6.run',
     'embedded_blob': 'cuda-linux.10.1.243-26907403.run',
     'patches': [],
@@ -456,7 +96,7 @@ cu_101['linux'] = {
     'libdevice_lib_fmt': 'libdevice.{0}.bc'
 }
 
-cu_101['windows'] = {'blob': 'cuda_10.1.243_426.00_windows.exe',
+config['windows'] = {'blob': 'cuda_10.1.243_426.00_windows.exe',
                    'patches': [],
                    'cuda_lib_fmt': '{0}64_10*.dll',
                    'nvtoolsext_fmt': '{0}64_1.dll',
@@ -467,7 +107,7 @@ cu_101['windows'] = {'blob': 'cuda_10.1.243_426.00_windows.exe',
                                     'NVIDIA Corporation', 'NVToolsExt', 'bin')
                    }
 
-cu_101['osx'] = {'blob': 'cuda_10.1.243_mac',
+config['osx'] = {'blob': 'cuda_10.1.243_mac',
                'patches': [],
                'cuda_lib_fmt': 'lib{0}.10.1.dylib',
                'nvtoolsext_fmt': 'lib{0}.1.dylib',
@@ -492,14 +132,14 @@ class Extractor(object):
           ver_config - the configuration for this CUDA version
           plt_config - the configuration for this platform
         """
-        self.cu_version = version
+        self.config_version = version
         self.md5_url = ver_config['md5_url']
         self.base_url = ver_config['base_url']
         self.patch_url_ext = ver_config['patch_url_ext']
         self.installers_url_ext = ver_config['installers_url_ext']
         self.cuda_libraries = ver_config['cuda_libraries']
         self.libdevice_versions = ver_config['libdevice_versions']
-        self.cu_blob = plt_config['blob']
+        self.config_blob = plt_config['blob']
         self.embedded_blob = plt_config.get('embedded_blob', None)
         self.cuda_lib_fmt = plt_config['cuda_lib_fmt']
         self.nvtoolsext_fmt = plt_config.get('nvtoolsext_fmt')
@@ -523,13 +163,13 @@ class Extractor(object):
         """Downloads the binary blobs to the $SRC_DIR
         """
         dl_url = urlparse.urljoin(self.base_url, self.installers_url_ext)
-        dl_url = urlparse.urljoin(dl_url, self.cu_blob)
-        dl_path = os.path.join(self.src_dir, self.cu_blob)
+        dl_url = urlparse.urljoin(dl_url, self.config_blob)
+        dl_path = os.path.join(self.src_dir, self.config_blob)
         if not self.debug_install_path:
             print("downloading %s to %s" % (dl_url, dl_path))
             download(dl_url, dl_path)
         else:
-            existing_file = os.path.join(self.debug_install_path, self.cu_blob)
+            existing_file = os.path.join(self.debug_install_path, self.config_blob)
             print("DEBUG: copying %s to %s" % (existing_file, dl_path))
             shutil.copy(existing_file, dl_path)
 
@@ -553,7 +193,7 @@ class Extractor(object):
         download(self.md5_url, path)
 
         # compute hash of blob
-        blob_path = os.path.join(self.src_dir, self.cu_blob)
+        blob_path = os.path.join(self.src_dir, self.config_blob)
         md5sum = hashsum_file(blob_path, 'md5')
 
         # get checksums
@@ -562,7 +202,7 @@ class Extractor(object):
 
         # check md5 and filename match up
         check_dict = {x[0]: x[1] for x in checksums}
-        assert check_dict[md5sum].startswith(self.cu_blob[:-7])
+        assert check_dict[md5sum].startswith(self.config_blob[:-7])
 
     def copy(self, *args):
         """The method to copy extracted files into the conda package platform
@@ -659,7 +299,7 @@ class WindowsExtractor(Extractor):
             libdevice_lib_dir=store)
 
     def extract(self):
-        runfile = self.cu_blob
+        runfile = self.config_blob
         patches = self.patches
         try:
             with tempdir() as tmpd:
@@ -728,7 +368,7 @@ class LinuxExtractor(Extractor):
                 basepath, 'nvvm', 'libdevice'))
 
     def extract(self):
-        runfile = self.cu_blob
+        runfile = self.config_blob
         patches = self.patches
         os.chmod(runfile, 0o777)
         with tempdir() as tmpd:
@@ -793,7 +433,7 @@ class OsxExtractor(Extractor):
                                 store, members=self._extract_matcher(tar))
 
     def extract(self):
-        runfile = self.cu_blob
+        runfile = self.config_blob
         patches = self.patches
         with tempdir() as tmpd:
             # fetch all the dylibs into lib64, but first get them out of the
@@ -837,17 +477,16 @@ def _main():
     print("Running build")
 
     # package version decl must match cuda release version
-    cu_version = os.environ['PKG_VERSION']
+    config_version = os.environ['PKG_VERSION']
     # keep only the major.minor version (10.0) if micro (10.0.130) is present
-    major_minor, micro = cu_version.rsplit('.', 1)
+    major_minor, micro = config_version.rsplit('.', 1)
     if '.' in major_minor:
-        cu_version = major_minor
+        config_version = major_minor
 
     # get an extractor
     plat = getplatform()
     extractor_impl = dispatcher[plat]
-    version_cfg = config[cu_version]
-    extractor = extractor_impl(cu_version, version_cfg, version_cfg[plat])
+    extractor = extractor_impl(config_version, config, config[plat])
 
     # download binaries
     extractor.download_blobs()

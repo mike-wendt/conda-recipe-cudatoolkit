@@ -5,8 +5,8 @@ package:
 
 build:
   number: 0
-  # script_env:
-  #   - NVTOOLSEXT_INSTALL_PATH
+  script_env:
+    - NVTOOLSEXT_INSTALL_PATH
   missing_dso_whitelist:
     - "$RPATH/libdl.so.2"
     - "$RPATH/libpthread.so.0"

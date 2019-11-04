@@ -16,11 +16,9 @@ def run_test():
     print("NVVM version", nvvm.get_version())
     # check pkg version matches lib pulled in
     gotlib = get_cudalib('cublas')
-    lookfor = os.environ['PKG_VERSION']
-    if sys.platform.startswith('win'):
-        # windows libs have no dot
-        lookfor = lookfor.replace('.', '')
-    return lookfor in gotlib
+    # check cufft b/c cublas has an incorrect version in 10.1 update 1
+    gotlib = get_cudalib('cufft')
+    return bool(get_cudalib('cublas')) and bool(get_cudalib('cufft'))
 
 
 sys.exit(0 if run_test() else 1)

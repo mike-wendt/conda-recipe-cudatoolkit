@@ -1,5 +1,6 @@
 from __future__ import print_function
 import fnmatch
+import hashlib
 import os
 import sys
 import shutil

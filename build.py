@@ -1,5 +1,6 @@
 from __future__ import print_function
 import fnmatch
+import hashlib
 import os
 import sys
 import shutil
@@ -78,15 +79,15 @@ def md5(fname):
 
 
 #######################
-### CUDA 10.1 (update 2) setup ###
+### CUDA 10.2 setup ###
 #######################
 
-maj_min = '10.1'
+maj_min = '10.2'
 config = {}
 config['base_url'] = f"http://developer.download.nvidia.com/compute/cuda/{maj_min}/Prod/"
 config['installers_url_ext'] = 'local_installers/'
 config['patch_url_ext'] = ''
-config['md5_url'] = f"{config['base_url']}/docs3/sidebar/md5sum.txt"
+config['md5_url'] = f"{config['base_url']}/docs/sidebar/md5sum.txt"
 config['cuda_libraries'] = [
     'cublas',
     'cublasLt',
@@ -120,8 +121,8 @@ if sys.platform.startswith('linux'):
 config['libdevice_versions'] = ['10']
 
 config['linux'] = {
-    'blob': 'cuda_10.1.243_418.87.00_rhel6.run',
-    'embedded_blob': 'cuda-linux.10.1.243-26907403.run',
+    'blob': 'cuda_10.2.89_440.33.01_rhel6.run',
+    'embedded_blob': 'cuda-linux.10.2.89-27506705.run',
     'patches': [],
     # need globs to handle symlinks
     'cuda_lib_fmt': 'lib{0}.so*',
@@ -130,7 +131,7 @@ config['linux'] = {
     'libdevice_lib_fmt': 'libdevice.{0}.bc'
 }
 
-config['windows'] = {'blob': 'cuda_10.1.243_426.00_windows.exe',
+config['windows'] = {'blob': 'cuda_10.2.89_441.22_windows.exe',
                    'patches': [],
                    'cuda_lib_fmt': '{0}64_10*.dll',
                    'nvtoolsext_fmt': '{0}64_1.dll',
@@ -141,7 +142,7 @@ config['windows'] = {'blob': 'cuda_10.1.243_426.00_windows.exe',
                                     'NVIDIA Corporation', 'NVToolsExt', 'bin')
                    }
 
-config['osx'] = {'blob': 'cuda_10.1.243_mac',
+config['osx'] = {'blob': 'cuda_10.2.89_mac',
                'patches': [],
                'cuda_lib_fmt': 'lib{0}.10.1.dylib',
                'nvtoolsext_fmt': 'lib{0}.1.dylib',

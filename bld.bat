@@ -1,4 +1,4 @@
-"%PYTHON%" build.py
+python build.py
 if errorlevel 1 exit 1
 
 :: copy nvvm and libdevice into the DLLs folder so numba can use them

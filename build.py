@@ -57,7 +57,8 @@ def md5(fname):
 # patch_url_ext the extra path needed to reach the patch directory from base_url
 # installers_url_ext the extra path needed to reach the local installers directory
 # md5_url the url for checksums
-# cuda_libraries the libraries to copy in
+# cuda_libraries the shared libraries to copy in
+# cuda_static_libraries the static libraries to copy in
 # libdevice_versions the library device versions supported (.bc files)
 # linux the linux platform config (see below)
 # windows the windows platform config (see below)
@@ -114,6 +115,9 @@ config['cuda_libraries'] = [
     'nvrtc',
     'nvrtc-builtins',
 ]
+config['cuda_static_libraries'] = [
+    'cudadevrt'
+]
 # nvjpeg is only available on linux
 if sys.platform.startswith('linux'):
     config['cuda_libraries'].append('nvjpeg')
@@ -125,6 +129,7 @@ config['linux'] = {
     'patches': [],
     # need globs to handle symlinks
     'cuda_lib_fmt': 'lib{0}.so*',
+    'cuda_static_lib_fmt': 'lib{0}.a',
     'nvtoolsext_fmt': 'lib{0}.so*',
     'nvvm_lib_fmt': 'lib{0}.so*',
     'libdevice_lib_fmt': 'libdevice.{0}.bc'
@@ -133,6 +138,7 @@ config['linux'] = {
 config['windows'] = {'blob': 'cuda_10.2.89_441.22_windows.exe',
                    'patches': [],
                    'cuda_lib_fmt': '{0}64_10*.dll',
+                   'cuda_static_lib_fmt': '{0}.lib',
                    'nvtoolsext_fmt': '{0}64_1.dll',
                    'nvvm_lib_fmt': '{0}64_33_0.dll',
                    'libdevice_lib_fmt': 'libdevice.{0}.bc',
@@ -163,10 +169,12 @@ class Extractor(object):
         self.patch_url_ext = ver_config['patch_url_ext']
         self.installers_url_ext = ver_config['installers_url_ext']
         self.cuda_libraries = ver_config['cuda_libraries']
+        self.cuda_static_libraries = ver_config['cuda_static_libraries']
         self.libdevice_versions = ver_config['libdevice_versions']
         self.config_blob = plt_config['blob']
         self.embedded_blob = plt_config.get('embedded_blob', None)
         self.cuda_lib_fmt = plt_config['cuda_lib_fmt']
+        self.cuda_static_lib_fmt = plt_config['cuda_static_lib_fmt']
         self.nvtoolsext_fmt = plt_config.get('nvtoolsext_fmt')
         self.nvvm_lib_fmt = plt_config['nvvm_lib_fmt']
         self.libdevice_lib_fmt = plt_config['libdevice_lib_fmt']
@@ -288,6 +296,8 @@ class Extractor(object):
         if 'nvToolsExt' in self.cuda_libraries:
             filepaths += self.get_paths(['nvToolsExt'], cuda_lib_dir,
                                         self.nvtoolsext_fmt)
+        filepaths += self.get_paths(self.cuda_static_libraries, cuda_lib_dir,
+                                    self.cuda_static_lib_fmt)
         filepaths += self.get_paths(['nvvm'], nvvm_lib_dir, self.nvvm_lib_fmt)
         filepaths += self.get_paths(self.libdevice_versions, libdevice_lib_dir,
                                     self.libdevice_lib_fmt)
@@ -353,6 +363,12 @@ class WindowsExtractor(Extractor):
                 for path, dirs, files in os.walk(extractdir):
                     if 'jre' not in path and 'GFExperience' not in path:  # don't get jre or GFExperience dlls
                         for filename in fnmatch.filter(files, "*.dll"):
+                            if not Path(os.path.join(
+                                    store, filename)).is_file():
+                                shutil.copy(
+                                    os.path.join(path, filename),
+                                    store)
+                        for filename in fnmatch.filter(files, "*.lib"):
                             if not Path(os.path.join(
                                     store, filename)).is_file():
                                 shutil.copy(

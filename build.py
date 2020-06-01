@@ -128,6 +128,7 @@ config['linux'] = {
     'blob': 'cuda_10.2.89_440.33.01_rhel6.run',
     'ppc64le_blob': 'cuda_10.2.89_440.33.01_linux_ppc64le.run',
     'embedded_blob': 'cuda-linux.10.2.89-27506705.run',
+    'ppc64le_embedded_blob': None,
     'patches': [],
     # need globs to handle symlinks
     'cuda_lib_fmt': 'lib{0}.so*',
@@ -408,6 +409,7 @@ class LinuxExtractor(Extractor):
                 plt_config['blob'] = plt_config['ppc64le_blob']
             else:
                 raise RuntimeError('ppc64le not supported for %s' % version)
+            plt_config['embedded_blob'] = plt_config['ppc64le_embedded_blob']
 
         super(LinuxExtractor, self).__init__(version, ver_config, plt_config)
 

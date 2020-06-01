@@ -1,5 +1,6 @@
 from __future__ import print_function
 import fnmatch
+import platform
 import hashlib
 import os
 import sys
@@ -125,6 +126,7 @@ config['libdevice_versions'] = ['10']
 
 config['linux'] = {
     'blob': 'cuda_10.2.89_440.33.01_rhel6.run',
+    'ppc64le_blob': 'cuda_10.2.89_440.33.01_linux_ppc64le.run',
     'embedded_blob': 'cuda-linux.10.2.89-27506705.run',
     'patches': [],
     # need globs to handle symlinks
@@ -399,6 +401,15 @@ class WindowsExtractor(Extractor):
 class LinuxExtractor(Extractor):
     """The linux extractor
     """
+
+    def __init__(self, version, ver_config, plt_config):
+        if platform.machine() == 'ppc64le':
+            if plt_config.get('ppc64le_blob') is not None:
+                plt_config['blob'] = plt_config['ppc64le_blob']
+            else:
+                raise RuntimeError('ppc64le not supported for %s' % version)
+
+        super(LinuxExtractor, self).__init__(version, ver_config, plt_config)
 
     def copy(self, *args):
         basepath = args[0]

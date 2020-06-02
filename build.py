@@ -415,11 +415,15 @@ class LinuxExtractor(Extractor):
 
     def copy(self, *args):
         basepath = args[0]
+        if self.embedded_blob is not None:
+            cudapath=''
+        else:
+            cudapath='cuda-toolkit'
         self.copy_files(
             cuda_lib_dir=os.path.join(
-                basepath, 'lib64'), nvvm_lib_dir=os.path.join(
-                basepath, 'nvvm', 'lib64'), libdevice_lib_dir=os.path.join(
-                basepath, 'nvvm', 'libdevice'))
+                basepath, cudapath, 'lib64'), nvvm_lib_dir=os.path.join(
+                basepath, cudapath, 'nvvm', 'lib64'), libdevice_lib_dir=os.path.join(
+                basepath, cudapath, 'nvvm', 'libdevice'))
 
     def extract(self):
         runfile = self.config_blob
@@ -437,7 +441,7 @@ class LinuxExtractor(Extractor):
                     check_call(cmd)
             else:
                 cmd = [os.path.join(self.src_dir, runfile),
-                       '--toolkitpath', tmpd, '--toolkit', '--silent']
+                       '--extract=%s' % (tmpd), '--toolkit', '--silent']
                 check_call(cmd)
             for p in patches:
                 os.chmod(p, 0o777)

@@ -57,13 +57,13 @@ def md5(fname):
 # patch_url_ext the extra path needed to reach the patch directory from base_url
 # installers_url_ext the extra path needed to reach the local installers directory
 # md5_url the url for checksums
-# cuda_libraries the libraries to copy in
+# cuda_libraries the shared libraries to copy in
+# cuda_static_libraries the static libraries to copy in
 # libdevice_versions the library device versions supported (.bc files)
 # linux the linux platform config (see below)
 # windows the windows platform config (see below)
-# osx the osx platform config (see below)
 #
-# For each of the 3 platform specific dictionaries linux, windows, osx
+# For each of the two platform specific dictionaries, linux and windows
 # a dictionary containing keys:
 # blob the name of the downloaded file, for linux this is the .run file
 # patches a list of the patch files for the blob, they are applied in order
@@ -115,6 +115,9 @@ config['cuda_libraries'] = [
     'nvrtc',
     'nvrtc-builtins',
 ]
+config['cuda_static_libraries'] = [
+    'cudadevrt'
+]
 # nvjpeg is only available on linux
 if sys.platform.startswith('linux'):
     config['cuda_libraries'].append('nvjpeg')
@@ -126,6 +129,7 @@ config['linux'] = {
     'patches': [],
     # need globs to handle symlinks
     'cuda_lib_fmt': 'lib{0}.so*',
+    'cuda_static_lib_fmt': 'lib{0}.a',
     'nvtoolsext_fmt': 'lib{0}.so*',
     'nvvm_lib_fmt': 'lib{0}.so*',
     'libdevice_lib_fmt': 'libdevice.{0}.bc'
@@ -134,6 +138,7 @@ config['linux'] = {
 config['windows'] = {'blob': 'cuda_10.2.89_441.22_windows.exe',
                    'patches': [],
                    'cuda_lib_fmt': '{0}64_10*.dll',
+                   'cuda_static_lib_fmt': '{0}.lib',
                    'nvtoolsext_fmt': '{0}64_1.dll',
                    'nvvm_lib_fmt': '{0}64_33_0.dll',
                    'libdevice_lib_fmt': 'libdevice.{0}.bc',
@@ -142,14 +147,6 @@ config['windows'] = {'blob': 'cuda_10.2.89_441.22_windows.exe',
                                     'NVIDIA Corporation', 'NVToolsExt', 'bin')
                    }
 
-config['osx'] = {'blob': 'cuda_10.2.89_mac',
-               'patches': [],
-               'cuda_lib_fmt': 'lib{0}.10.1.dylib',
-               'nvtoolsext_fmt': 'lib{0}.1.dylib',
-               'nvvm_lib_fmt': 'lib{0}.3.3.0.dylib',
-               'libdevice_lib_fmt': 'libdevice.{0}.bc'
-               }
-
 
 class Extractor(object):
     """Extractor base class, platform specific extractors should inherit
@@ -157,7 +154,6 @@ class Extractor(object):
     """
 
     libdir = {'linux': 'lib',
-              'osx': 'lib',
               'windows': 'Library/bin'}
 
     def __init__(self, version, ver_config, plt_config):
@@ -173,10 +169,12 @@ class Extractor(object):
         self.patch_url_ext = ver_config['patch_url_ext']
         self.installers_url_ext = ver_config['installers_url_ext']
         self.cuda_libraries = ver_config['cuda_libraries']
+        self.cuda_static_libraries = ver_config['cuda_static_libraries']
         self.libdevice_versions = ver_config['libdevice_versions']
         self.config_blob = plt_config['blob']
         self.embedded_blob = plt_config.get('embedded_blob', None)
         self.cuda_lib_fmt = plt_config['cuda_lib_fmt']
+        self.cuda_static_lib_fmt = plt_config['cuda_static_lib_fmt']
         self.nvtoolsext_fmt = plt_config.get('nvtoolsext_fmt')
         self.nvvm_lib_fmt = plt_config['nvvm_lib_fmt']
         self.libdevice_lib_fmt = plt_config['libdevice_lib_fmt']
@@ -298,6 +296,8 @@ class Extractor(object):
         if 'nvToolsExt' in self.cuda_libraries:
             filepaths += self.get_paths(['nvToolsExt'], cuda_lib_dir,
                                         self.nvtoolsext_fmt)
+        filepaths += self.get_paths(self.cuda_static_libraries, cuda_lib_dir,
+                                    self.cuda_static_lib_fmt)
         filepaths += self.get_paths(['nvvm'], nvvm_lib_dir, self.nvvm_lib_fmt)
         filepaths += self.get_paths(self.libdevice_versions, libdevice_lib_dir,
                                     self.libdevice_lib_fmt)
@@ -368,6 +368,12 @@ class WindowsExtractor(Extractor):
                                 shutil.copy(
                                     os.path.join(path, filename),
                                     store)
+                        for filename in fnmatch.filter(files, "*.lib"):
+                            if not Path(os.path.join(
+                                    store, filename)).is_file():
+                                shutil.copy(
+                                    os.path.join(path, filename),
+                                    store)
                         for filename in fnmatch.filter(files, "*.bc"):
                             if not Path(os.path.join(
                                     store, filename)).is_file():
@@ -428,69 +434,6 @@ class LinuxExtractor(Extractor):
             self.copy(tmpd)
 
 
-@contextmanager
-def _hdiutil_mount(mntpnt, image):
-    """Context manager to mount osx dmg images and ensure they are
-    unmounted on exit.
-    """
-    check_call(['hdiutil', 'attach', '-mountpoint', mntpnt, image])
-    yield mntpnt
-    check_call(['hdiutil', 'detach', mntpnt])
-
-
-class OsxExtractor(Extractor):
-    """The osx extractor
-    """
-
-    def copy(self, *args):
-        basepath, store = args
-        self.copy_files(cuda_lib_dir=store,
-                        nvvm_lib_dir=store,
-                        libdevice_lib_dir=store)
-
-    def _extract_matcher(self, tarmembers):
-        """matcher helper for tarfile.extractall()
-        """
-        for tarinfo in tarmembers:
-            ext = os.path.splitext(tarinfo.name)[-1]
-            if ext == '.dylib' or ext == '.bc':
-                yield tarinfo
-
-    def _mount_extract(self, image, store):
-        """Mounts and extracts the files from an image into store
-        """
-        with tempdir() as tmpmnt:
-            with _hdiutil_mount(tmpmnt, os.path.join(os.getcwd(), image)) as mntpnt:
-                for tlpath, tldirs, tlfiles in os.walk(mntpnt):
-                    for tzfile in fnmatch.filter(tlfiles, "*.tar.gz"):
-                        with tarfile.open(os.path.join(tlpath, tzfile)) as tar:
-                            tar.extractall(
-                                store, members=self._extract_matcher(tar))
-
-    def extract(self):
-        runfile = self.config_blob
-        patches = self.patches
-        with tempdir() as tmpd:
-            # fetch all the dylibs into lib64, but first get them out of the
-            # image and tar.gzs into tmpstore
-            extract_store_name = 'tmpstore'
-            extract_store = os.path.join(tmpd, extract_store_name)
-            os.mkdir(extract_store)
-            store_name = 'lib64'
-            store = os.path.join(tmpd, store_name)
-            os.mkdir(store)
-            self._mount_extract(runfile, extract_store)
-            for p in self.patches:
-                self._mount_extract(p, extract_store)
-            for path, dirs, files in os.walk(extract_store):
-                for filename in fnmatch.filter(files, "*.dylib"):
-                    if not Path(os.path.join(store, filename)).is_file():
-                        shutil.copy(os.path.join(path, filename), store)
-                for filename in fnmatch.filter(files, "*.bc"):
-                    if not Path(os.path.join(store, filename)).is_file():
-                        shutil.copy(os.path.join(path, filename), store)
-            self.copy(tmpd, store)
-
 
 def getplatform():
     plt = sys.platform
@@ -498,14 +441,10 @@ def getplatform():
         return 'linux'
     elif plt.startswith('win'):
         return 'windows'
-    elif plt.startswith('darwin'):
-        return 'osx'
     else:
         raise RuntimeError('Unknown platform')
 
-dispatcher = {'linux': LinuxExtractor,
-              'windows': WindowsExtractor,
-              'osx': OsxExtractor}
+dispatcher = {'linux': LinuxExtractor, 'windows': WindowsExtractor}
 
 
 def _main():

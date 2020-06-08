@@ -11,7 +11,7 @@ source:
 # downloaded the installer
 
 build:
-  number: 0
+  number: 1
   script_env:
     - NVTOOLSEXT_INSTALL_PATH
     - DEBUG_INSTALLER_PATH

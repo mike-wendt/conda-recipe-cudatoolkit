@@ -114,7 +114,6 @@ config['cuda_libraries'] = [
     'npps',
     'nvToolsExt',
     'nvblas',
-    'nvgraph',
     'nvjpeg',
     'nvidia-ml',
     'nvrtc',

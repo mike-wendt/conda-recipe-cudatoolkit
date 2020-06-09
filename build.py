@@ -115,6 +115,7 @@ config['cuda_libraries'] = [
     'nvToolsExt',
     'nvblas',
     'nvgraph',
+    'nvjpeg',
     'nvidia-ml',
     'nvrtc',
     'nvrtc-builtins',
@@ -123,9 +124,6 @@ config['cuda_static_libraries'] = [
     'cudadevrt',
     'culibos'
 ]
-# nvjpeg is only available on linux
-if sys.platform.startswith('linux'):
-    config['cuda_libraries'].append('nvjpeg')
 config['libdevice_versions'] = ['11']
 
 config['linux'] = {

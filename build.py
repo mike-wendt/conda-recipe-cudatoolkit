@@ -79,12 +79,12 @@ def md5(fname):
 
 
 #######################
-### CUDA 10.2 setup ###
+### CUDA 11.0 setup ###
 #######################
 
-maj_min = '10.2'
+maj_min = '11.0'
 config = {}
-config['base_url'] = f"http://developer.download.nvidia.com/compute/cuda/{maj_min}/Prod/"
+config['base_url'] = f"http://developer.download.nvidia.com/compute/cuda/11.0.1/"
 config['installers_url_ext'] = 'local_installers/'
 config['patch_url_ext'] = ''
 config['md5_url'] = f"{config['base_url']}/docs/sidebar/md5sum.txt"
@@ -121,11 +121,11 @@ config['cuda_static_libraries'] = [
 # nvjpeg is only available on linux
 if sys.platform.startswith('linux'):
     config['cuda_libraries'].append('nvjpeg')
-config['libdevice_versions'] = ['10']
+config['libdevice_versions'] = ['11']
 
 config['linux'] = {
-    'blob': 'cuda_10.2.89_440.33.01_rhel6.run',
-    'embedded_blob': 'cuda-linux.10.2.89-27506705.run',
+    'blob': 'cuda_11.0.1_450.36.06_linux.run',
+    'embedded_blob': 'NVIDIA-Linux-x86_64-450.36.06.run',
     'patches': [],
     # need globs to handle symlinks
     'cuda_lib_fmt': 'lib{0}.so*',
@@ -135,7 +135,7 @@ config['linux'] = {
     'libdevice_lib_fmt': 'libdevice.{0}.bc'
 }
 
-config['windows'] = {'blob': 'cuda_10.2.89_441.22_windows.exe',
+config['windows'] = {'blob': 'cuda_11.0.1_451.22_win10.exe',
                    'patches': [],
                    'cuda_lib_fmt': '{0}64_10*.dll',
                    'cuda_static_lib_fmt': '{0}.lib',

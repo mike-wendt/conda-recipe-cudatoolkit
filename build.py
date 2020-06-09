@@ -103,7 +103,6 @@ config['cuda_libraries'] = [
     'nppc',
     'nppial',
     'nppicc',
-    'nppicom',
     'nppidei',
     'nppif',
     'nppig',

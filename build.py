@@ -127,7 +127,6 @@ config['libdevice_versions'] = ['11']
 
 config['linux'] = {
     'blob': 'cuda_11.0.1_450.36.06_linux.run',
-    'embedded_blob': 'NVIDIA-Linux-x86_64-450.36.06.run',
     'patches': [],
     # need globs to handle symlinks
     'cuda_lib_fmt': 'lib{0}.so*',

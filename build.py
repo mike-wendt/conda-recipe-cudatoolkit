@@ -89,13 +89,11 @@ config['installers_url_ext'] = 'local_installers/'
 config['patch_url_ext'] = ''
 config['md5_url'] = f"{config['base_url']}/docs/sidebar/md5sum.txt"
 config['cuda_libraries'] = [
-    'accinj64',
     'cublas',
     'cublasLt',
     'cudart',
     'cufft',
     'cufftw',
-    'cuinj64',
     'curand',
     'cusolver',
     'cusolverMg',
@@ -122,6 +120,10 @@ config['cuda_static_libraries'] = [
     'cudadevrt',
     'culibos'
 ]
+# accinj64 & cuinj64 are only available on linux
+if sys.platform.startswith('linux'):
+    config['cuda_libraries'].append('accinj64')
+    config['cuda_libraries'].append('cuinj64')
 config['libdevice_versions'] = ['11']
 
 config['linux'] = {

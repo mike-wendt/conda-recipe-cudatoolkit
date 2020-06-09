@@ -140,7 +140,7 @@ config['linux'] = {
 
 config['windows'] = {'blob': 'cuda_11.0.1_451.22_win10.exe',
                    'patches': [],
-                   'cuda_lib_fmt': '{0}64_10*.dll',
+                   'cuda_lib_fmt': '{0}64_1*.dll',
                    'cuda_static_lib_fmt': '{0}.lib',
                    'nvtoolsext_fmt': '{0}64_1.dll',
                    'nvvm_lib_fmt': '{0}64_33_0.dll',

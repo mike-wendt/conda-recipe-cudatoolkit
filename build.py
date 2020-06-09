@@ -118,8 +118,7 @@ config['cuda_libraries'] = [
     'nvrtc-builtins',
 ]
 config['cuda_static_libraries'] = [
-    'cudadevrt',
-    'culibos'
+    'cudadevrt'
 ]
 # accinj64 is only available on linux
 if sys.platform.startswith('linux'):

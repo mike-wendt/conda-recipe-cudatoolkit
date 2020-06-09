@@ -89,13 +89,16 @@ config['installers_url_ext'] = 'local_installers/'
 config['patch_url_ext'] = ''
 config['md5_url'] = f"{config['base_url']}/docs/sidebar/md5sum.txt"
 config['cuda_libraries'] = [
+    'accinj64',
     'cublas',
     'cublasLt',
     'cudart',
     'cufft',
     'cufftw',
+    'cuinj64',
     'curand',
     'cusolver',
+    'cusolverMg',
     'cusparse',
     'nppc',
     'nppial',
@@ -112,11 +115,13 @@ config['cuda_libraries'] = [
     'nvToolsExt',
     'nvblas',
     'nvgraph',
+    'nvidia-ml',
     'nvrtc',
     'nvrtc-builtins',
 ]
 config['cuda_static_libraries'] = [
-    'cudadevrt'
+    'cudadevrt',
+    'culibos'
 ]
 # nvjpeg is only available on linux
 if sys.platform.startswith('linux'):

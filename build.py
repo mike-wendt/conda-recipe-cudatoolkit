@@ -132,7 +132,7 @@ config['linux'] = {
     'cuda_static_lib_fmt': 'lib{0}.a',
     'nvtoolsext_fmt': 'lib{0}.so*',
     'nvvm_lib_fmt': 'lib{0}.so*',
-    'libdevice_lib_fmt': 'libdevice.{0}.bc'
+    'libdevice_lib_fmt': 'libdevice.10.bc'
 }
 
 config['windows'] = {'blob': 'cuda_11.0.1_451.22_win10.exe',
@@ -141,7 +141,7 @@ config['windows'] = {'blob': 'cuda_11.0.1_451.22_win10.exe',
                    'cuda_static_lib_fmt': '{0}.lib',
                    'nvtoolsext_fmt': '{0}64_1.dll',
                    'nvvm_lib_fmt': '{0}64_33_0.dll',
-                   'libdevice_lib_fmt': 'libdevice.{0}.bc',
+                   'libdevice_lib_fmt': 'libdevice.10.bc',
                    'NvToolsExtPath' :
                        os.path.join('c:' + os.sep, 'Program Files',
                                     'NVIDIA Corporation', 'NVToolsExt', 'bin')

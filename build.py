@@ -113,7 +113,6 @@ config['cuda_libraries'] = [
     'nvToolsExt',
     'nvblas',
     'nvjpeg',
-    'nvidia-ml',
     'nvrtc',
     'nvrtc-builtins',
 ]

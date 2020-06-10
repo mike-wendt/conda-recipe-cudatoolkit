@@ -424,7 +424,7 @@ class LinuxExtractor(Extractor):
                     check_call(cmd)
             else:
                 cmd = [os.path.join(self.src_dir, runfile),
-                       '--toolkitpath=%s' % (tmpd, ), '--toolkit', '--silent', '--override']
+                       '--toolkitpath=%s' % (tmpd, ), '--toolkit', '--silent', '--override', '--nox11']
                 check_call(cmd)
             for p in patches:
                 os.chmod(p, 0o777)

@@ -84,7 +84,7 @@ def md5(fname):
 
 maj_min = '11.0'
 config = {}
-config['base_url'] = f"http://developer.download.nvidia.com/compute/cuda/11.0.1/"
+config['base_url'] = f"http://developer.download.nvidia.com/compute/cuda/11.0.2/"
 config['installers_url_ext'] = 'local_installers/'
 config['patch_url_ext'] = ''
 config['md5_url'] = f"{config['base_url']}/docs/sidebar/md5sum.txt"
@@ -125,7 +125,7 @@ if sys.platform.startswith('linux'):
 config['libdevice_versions'] = ['11']
 
 config['linux'] = {
-    'blob': 'cuda_11.0.1_450.36.06_linux.run',
+    'blob': 'cuda_11.0.2_450.51.05_linux.run',
     'patches': [],
     # need globs to handle symlinks
     'cuda_lib_fmt': 'lib{0}.so*',
@@ -135,7 +135,7 @@ config['linux'] = {
     'libdevice_lib_fmt': 'libdevice.10.bc'
 }
 
-config['windows'] = {'blob': 'cuda_11.0.1_451.22_win10.exe',
+config['windows'] = {'blob': 'cuda_11.0.2_451.48_win10.exe',
                    'patches': [],
                    'cuda_lib_fmt': '{0}64_1*.dll',
                    'cuda_static_lib_fmt': '{0}.lib',

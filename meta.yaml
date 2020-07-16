@@ -20,7 +20,7 @@ build:
     - "$RPATH/libpthread.so.0"
     - "$RPATH/libc.so.6"
     - "$RPATH/librt.so.1"
-    - "$RPATH/ld-linux-x86-64.so.2"
+    - "$RPATH/ld-linux-aarch64.so.2"
     - "$RPATH/libm.so.6"
 
 requirements:

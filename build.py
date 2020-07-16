@@ -94,7 +94,6 @@ config['cuda_libraries'] = [
     'cudart',
     'cufft',
     'cufftw',
-    'cuinj64',
     'curand',
     'cusolver',
     'cusolverMg',
@@ -119,9 +118,9 @@ config['cuda_libraries'] = [
 config['cuda_static_libraries'] = [
     'cudadevrt'
 ]
-# accinj64 is only available on linux
-if sys.platform.startswith('linux'):
-    config['cuda_libraries'].append('accinj64')
+# accinj64 is only available on linux-64
+#if sys.platform.startswith('linux'):
+#    config['cuda_libraries'].append('accinj64')
 config['libdevice_versions'] = ['11']
 
 config['linux'] = {

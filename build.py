@@ -125,7 +125,7 @@ if sys.platform.startswith('linux'):
 config['libdevice_versions'] = ['11']
 
 config['linux'] = {
-    'blob': 'cuda_11.0.2_450.51.05_linux.run',
+    'blob': 'cuda_11.0.2_450.51.05_linux_sbsa.run',
     'patches': [],
     # need globs to handle symlinks
     'cuda_lib_fmt': 'lib{0}.so*',

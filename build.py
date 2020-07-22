@@ -440,8 +440,16 @@ class LinuxExtractor(Extractor):
                            '-prefix', tmpd, '-noprompt', '--nox11']
                     check_call(cmd)
             else:
+                # Nvidia's RHEL7 based runfiles don't use embedded runfiles
+                # Once the toolkit is extracted, it ends up in a directory called "cuda-toolkit'
+                # the --extract runfile command is used because letting the runfile do an "install" 
+                # results in attempted installs of .pc and doc files into standard Linux locations, 
+                # which is not what we want.
+                # The "--override" runfile command to disable the compiler check since we are not
+                # installing the driver here.
+
                 cmd = [os.path.join(self.src_dir, runfile),
-                       '--extract=%s' % (tmpd), '--toolkit', '--silent']
+                       '--extract=%s' % (tmpd), '--toolkit', '--silent', '--override']
                 check_call(cmd)
             for p in patches:
                 os.chmod(p, 0o777)

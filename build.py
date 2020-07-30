@@ -1,5 +1,6 @@
 from __future__ import print_function
 import fnmatch
+import platform
 import hashlib
 import os
 import sys
@@ -126,6 +127,10 @@ config['libdevice_versions'] = ['11']
 
 config['linux'] = {
     'blob': 'cuda_11.0.2_450.51.05_linux.run',
+    'ppc64le_blob': 'cuda_11.0.2_450.51.05_linux_ppc64le.run',
+    # CUDA 11 installer has channed, there are no embedded blobs
+    'embedded_blob': None,
+    'ppc64le_embedded_blob': None,
     'patches': [],
     # need globs to handle symlinks
     'cuda_lib_fmt': 'lib{0}.so*',
@@ -400,13 +405,27 @@ class LinuxExtractor(Extractor):
     """The linux extractor
     """
 
+    def __init__(self, version, ver_config, plt_config):
+        if platform.machine() == 'ppc64le':
+            if plt_config.get('ppc64le_blob') is not None:
+                plt_config['blob'] = plt_config['ppc64le_blob']
+            else:
+                raise RuntimeError('ppc64le not supported for %s' % version)
+            plt_config['embedded_blob'] = plt_config['ppc64le_embedded_blob']
+
+        super(LinuxExtractor, self).__init__(version, ver_config, plt_config)
+
     def copy(self, *args):
         basepath = args[0]
+        if self.embedded_blob is not None:
+            cudapath=''
+        else:
+            cudapath='cuda-toolkit'
         self.copy_files(
             cuda_lib_dir=os.path.join(
-                basepath, 'lib64'), nvvm_lib_dir=os.path.join(
-                basepath, 'nvvm', 'lib64'), libdevice_lib_dir=os.path.join(
-                basepath, 'nvvm', 'libdevice'))
+                basepath, cudapath, 'lib64'), nvvm_lib_dir=os.path.join(
+                basepath, cudapath, 'nvvm', 'lib64'), libdevice_lib_dir=os.path.join(
+                basepath, cudapath, 'nvvm', 'libdevice'))
 
     def extract(self):
         runfile = self.config_blob
@@ -423,13 +442,22 @@ class LinuxExtractor(Extractor):
                            '-prefix', tmpd, '-noprompt', '--nox11']
                     check_call(cmd)
             else:
+                # Nvidia's Linux based runfiles don't use embedded runfiles
+                # Once the toolkit is extracted, it ends up in a directory called "cuda-toolkit'
+                #
+                # "--extract" runfile command is used because letting the runfile do an "install" 
+                #     results in attempted installs of .pc and doc files into standard Linux locations, 
+                #     which is not what we want
+                # "--override" runfile command to disable the compiler check since we are not
+                #     installing the driver here
+                # "--nox11" runfile command prevents desktop GUI on local install
                 cmd = [os.path.join(self.src_dir, runfile),
-                       '--toolkitpath=%s' % (tmpd, ), '--toolkit', '--silent', '--override', '--nox11']
+                       '--extract=%s' % (tmpd), '--toolkit', '--silent', '--override', '--nox11']
                 check_call(cmd)
             for p in patches:
                 os.chmod(p, 0o777)
                 cmd = [os.path.join(self.src_dir, p),
-                            '--installdir', tmpd, '--accept-eula', '--silent']
+                        '--installdir', tmpd, '--accept-eula', '--silent']
                 check_call(cmd)
             self.copy(tmpd)
 

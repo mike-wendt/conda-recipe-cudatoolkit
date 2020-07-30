@@ -32,6 +32,8 @@ requirements:
     - tqdm
     # for run_exports
     - {{ compiler('cxx') }}
+  run:
+    - __cuda >=11.0
 
 test:
   requires:

@@ -445,14 +445,14 @@ class LinuxExtractor(Extractor):
                 # Nvidia's Linux based runfiles don't use embedded runfiles
                 # Once the toolkit is extracted, it ends up in a directory called "cuda-toolkit'
                 #
-                # "--extract" runfile command is used because letting the runfile do an "install" 
-                #     results in attempted installs of .pc and doc files into standard Linux locations, 
+                # "--toolkitpath" runfile command is used because letting the runfile do an "install"
+                #     results in attempted installs of .pc and doc files into standard Linux locations,
                 #     which is not what we want
                 # "--override" runfile command to disable the compiler check since we are not
                 #     installing the driver here
                 # "--nox11" runfile command prevents desktop GUI on local install
                 cmd = [os.path.join(self.src_dir, runfile),
-                       '--extract=%s' % (tmpd), '--toolkit', '--silent', '--override', '--nox11']
+                       '--toolkitpath=%s' % (tmpd), '--toolkit', '--silent', '--override', '--nox11']
                 check_call(cmd)
             for p in patches:
                 os.chmod(p, 0o777)

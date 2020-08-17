@@ -135,6 +135,7 @@ config['linux'] = {
     'embedded_blob': None,
     'ppc64le_embedded_blob': None,
     'patches': [],
+    'lib_folder_name': 'lib',
     # need globs to handle symlinks
     'cuda_lib_fmt': 'lib{0}.so*',
     'cuda_static_lib_fmt': 'lib{0}.a',
@@ -145,6 +146,7 @@ config['linux'] = {
 
 config['windows'] = {'blob': 'cuda_11.0.2_451.48_win10.exe',
                    'patches': [],
+                   'lib_folder_name': 'lib',
                    'cuda_lib_fmt': '{0}64_1*.dll',
                    'cuda_static_lib_fmt': '{0}.lib',
                    'nvtoolsext_fmt': '{0}64_1.dll',
@@ -187,6 +189,7 @@ class Extractor(object):
         self.nvvm_lib_fmt = plt_config['nvvm_lib_fmt']
         self.libdevice_lib_fmt = plt_config['libdevice_lib_fmt']
         self.patches = plt_config['patches']
+        self.lib_folder_name = plt_config.get('lib_folder_name', 'lib')
         self.nvtoolsextpath = plt_config.get('NvToolsExtPath')
         self.config = {'version': version, **ver_config}
         self.prefix = os.environ['PREFIX']
@@ -420,14 +423,15 @@ class LinuxExtractor(Extractor):
 
     def copy(self, *args):
         basepath = args[0]
+        libpath = self.lib_folder_name
         if self.embedded_blob is not None:
             cudapath=''
         else:
             cudapath='cuda-toolkit'
         self.copy_files(
             cuda_lib_dir=os.path.join(
-                basepath, cudapath, 'lib64'), nvvm_lib_dir=os.path.join(
-                basepath, cudapath, 'nvvm', 'lib64'), libdevice_lib_dir=os.path.join(
+                basepath, cudapath, libpath), nvvm_lib_dir=os.path.join(
+                basepath, cudapath, 'nvvm', libpath), libdevice_lib_dir=os.path.join(
                 basepath, cudapath, 'nvvm', 'libdevice'))
 
     def extract(self):

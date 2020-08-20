@@ -441,12 +441,11 @@ class LinuxExtractor(Extractor):
                            '-prefix', tmpd, '-noprompt', '--nox11']
                     check_call(cmd)
             else:
-                # Nvidia's Linux based runfiles don't use embedded runfiles
-                # Once the toolkit is extracted, it ends up in a directory called "cuda-toolkit'
+                # Current Nvidia's Linux based runfiles don't use embedded runfiles
                 #
-                # "--extract" runfile command is used because letting the runfile do an "install"
-                #     results in attempted installs of .pc and doc files into standard Linux locations,
-                #     which is not what we want
+                # "--installpath" runfile command is used to install the toolkit to a specified
+                #     directory with the contents and layout similar to an install to
+                #     '/usr/local/cuda`
                 # "--override" runfile command to disable the compiler check since we are not
                 #     installing the driver here
                 # "--nox11" runfile command prevents desktop GUI on local install

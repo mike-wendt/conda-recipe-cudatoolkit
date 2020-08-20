@@ -135,7 +135,7 @@ config['linux'] = {
     'embedded_blob': None,
     'ppc64le_embedded_blob': None,
     'patches': [],
-    'lib_folder_name': 'lib',
+    'lib_folder_name': 'lib64',
     # need globs to handle symlinks
     'cuda_lib_fmt': 'lib{0}.so*',
     'cuda_static_lib_fmt': 'lib{0}.a',

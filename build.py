@@ -424,15 +424,11 @@ class LinuxExtractor(Extractor):
     def copy(self, *args):
         basepath = args[0]
         libpath = self.lib_folder_name
-        if self.embedded_blob is not None:
-            cudapath=''
-        else:
-            cudapath='cuda-toolkit'
         self.copy_files(
             cuda_lib_dir=os.path.join(
-                basepath, cudapath, libpath), nvvm_lib_dir=os.path.join(
-                basepath, cudapath, 'nvvm', libpath), libdevice_lib_dir=os.path.join(
-                basepath, cudapath, 'nvvm', 'libdevice'))
+                basepath, libpath), nvvm_lib_dir=os.path.join(
+                basepath, 'nvvm', libpath), libdevice_lib_dir=os.path.join(
+                basepath, 'nvvm', 'libdevice'))
 
     def extract(self):
         runfile = self.config_blob
@@ -459,7 +455,7 @@ class LinuxExtractor(Extractor):
                 #     installing the driver here
                 # "--nox11" runfile command prevents desktop GUI on local install
                 cmd = [os.path.join(self.src_dir, runfile),
-                       '--extract=%s' % (tmpd), '--toolkit', '--silent', '--override', '--nox11']
+                       '--installpath=%s' % (tmpd), '--toolkit', '--silent', '--override', '--nox11']
                 check_call(cmd)
             for p in patches:
                 os.chmod(p, 0o777)

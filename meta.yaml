@@ -33,7 +33,7 @@ requirements:
     # for run_exports
     - {{ compiler('cxx') }}
   run:
-    - __glibc >=2.17
+    - __glibc >=2.17 # [linux]
 
 test:
   requires:

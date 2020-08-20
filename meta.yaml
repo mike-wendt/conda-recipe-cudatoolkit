@@ -33,7 +33,7 @@ requirements:
     # for run_exports
     - {{ compiler('cxx') }}
   run:
-    - __cuda >=11.0
+    - __glibc >=2.17
 
 test:
   requires:

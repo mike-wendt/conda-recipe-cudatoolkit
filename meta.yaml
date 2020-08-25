@@ -33,7 +33,7 @@ requirements:
     # for run_exports
     - {{ compiler('cxx') }}
   run_constrained:
-    - _cuda >=11.0
+    - __cuda >=11.0
 
 test:
   requires:

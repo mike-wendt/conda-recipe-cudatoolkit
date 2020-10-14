@@ -79,13 +79,13 @@ def md5(fname):
 # defined install directory) and the DLL will be taken from that location.
 
 
-###########################################
-### CUDA 11.0 Update 1 setup (Aug 2020) ###
-###########################################
+##################################
+### CUDA 11.1 setup (Oct 2020) ###
+##################################
 
-maj_min = '11.0'
+maj_min = '11.1'
 config = {}
-config['base_url'] = f"http://developer.download.nvidia.com/compute/cuda/11.0.3/"
+config['base_url'] = f"http://developer.download.nvidia.com/compute/cuda/11.1.0/"
 config['installers_url_ext'] = 'local_installers/'
 config['patch_url_ext'] = ''
 config['md5_url'] = f"{config['base_url']}/docs/sidebar/md5sum.txt"
@@ -129,9 +129,9 @@ if sys.platform.startswith('windows'):
 config['libdevice_versions'] = ['11']
 
 config['linux'] = {
-    'blob': 'cuda_11.0.3_450.51.06_linux.run',
-    'ppc64le_blob': 'cuda_11.0.3_450.51.06_linux_ppc64le.run',
-    # CUDA 11 installer has channed, there are no embedded blobs
+    'blob': 'cuda_11.1.0_455.23.05_linux.run',
+    'ppc64le_blob': 'cuda_11.1.0_455.23.05_linux_ppc64le.run',
+    # CUDA 11 installer has changed, there are no embedded blobs
     'embedded_blob': None,
     'ppc64le_embedded_blob': None,
     'patches': [],
@@ -143,7 +143,7 @@ config['linux'] = {
     'libdevice_lib_fmt': 'libdevice.10.bc'
 }
 
-config['windows'] = {'blob': 'cuda_11.0.3_451.82_win10.exe',
+config['windows'] = {'blob': 'cuda_11.1.0_456.43_win10.exe',
                    'patches': [],
                    'cuda_lib_fmt': '{0}64_1*.dll',
                    'cuda_static_lib_fmt': '{0}.lib',
